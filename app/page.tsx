@@ -104,12 +104,12 @@ function StepProgress({ current }: { current: Step }) {
               className="h-1.5 rounded-full"
               animate={{
                 width: index === currentIndex ? 42 : 16,
-                backgroundColor: active ? "var(--wine)" : "rgba(43,33,28,0.24)",
+                backgroundColor: active ? "var(--wine)" : "rgba(194,213,255,0.24)",
               }}
             />
             <span
               className="text-[10px] uppercase tracking-[0.16em]"
-              style={{ color: active ? "var(--wine)" : "rgba(43,33,28,0.45)" }}
+              style={{ color: active ? "var(--wine)" : "rgba(214,228,255,0.62)" }}
             >
               {item.label}
             </span>
@@ -180,7 +180,7 @@ export default function Home() {
             <motion.div
               whileHover={{ scale: 1.06, rotate: -4 }}
               transition={{ type: "spring", stiffness: 360, damping: 20 }}
-              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center shadow-[0_8px_18px_rgba(255,0,51,0.28)]"
+              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-[#051111] grid place-content-center shadow-[0_8px_18px_rgba(61,217,199,0.28)]"
             >
               <Youtube size={18} />
             </motion.div>
@@ -203,14 +203,14 @@ export default function Home() {
             {step !== "welcome" && (
               <div className="mb-6 space-y-3">
                 <StepProgress current={step} />
-                <div className="rounded-2xl border border-[rgba(15,15,16,0.12)] bg-white/80 px-3 py-2 text-xs text-[rgba(15,15,16,0.7)] flex flex-wrap gap-2">
-                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1">
+                <div className="rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.74)] px-3 py-2 text-xs text-[rgba(229,238,255,0.8)] flex flex-wrap gap-2">
+                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1">
                     Temps: {duration ? `${duration} min` : "A definir"}
                   </span>
-                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1 truncate max-w-[220px]">
+                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1 truncate max-w-[220px]">
                     Ambiance: {ambiancePreview}
                   </span>
-                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1">
+                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1">
                     Langue: {step === "language" ? "Choix en cours" : "A definir"}
                   </span>
                 </div>
@@ -232,9 +232,9 @@ export default function Home() {
                   </p>
                   <SplitTitle text="T'en as marre de scroller ?" />
 
-                  <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
-                    Tu donnes ton temps, ta langue et ton style du moment. On te propose
-                    directement des videos qui se regardent bien pendant ton repas.
+                  <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(224,236,255,0.8)] leading-relaxed">
+                    Tu donnes ton temps, ta langue, et ce que t'as envie de regarder.
+                    On te propose directement des videos qui matchent ton repas.
                   </p>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -242,7 +242,7 @@ export default function Home() {
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => toStep("duration")}
-                      className="yt-button rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(255,0,51,0.28)]"
+                      className="yt-button rounded-2xl bg-[var(--wine)] text-[#041110] px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(61,217,199,0.24)]"
                     >
                       C'est parti
                       <ChevronRight size={18} />
@@ -251,7 +251,7 @@ export default function Home() {
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => pushToResults("any", true)}
-                      className="yt-button rounded-2xl border border-[rgba(15,15,16,0.16)] bg-white/80 px-6 py-4 font-semibold text-sm md:text-base text-[var(--charcoal)] flex items-center justify-center gap-2"
+                      className="yt-button rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.74)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--ink)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
                       Mode surprise
@@ -263,7 +263,7 @@ export default function Home() {
                       (item) => (
                         <span
                           key={item}
-                          className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white/85 px-3 py-1 text-xs font-medium text-[rgba(15,15,16,0.72)]"
+                          className="rounded-full border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.68)] px-3 py-1 text-xs font-medium text-[rgba(224,236,255,0.8)]"
                         >
                           {item}
                         </span>
@@ -286,7 +286,7 @@ export default function Home() {
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Combien de temps tu as ?
                   </h2>
-                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
                     On filtre la duree pour que la video colle a ton repas.
                   </p>
 
@@ -303,11 +303,11 @@ export default function Home() {
                           setDuration(item.value);
                           toStep("mood");
                         }}
-                        className="yt-button rounded-2xl border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.88)] p-4 text-left hover:shadow-[0_12px_24px_rgba(15,15,16,0.08)]"
+                        className="yt-button rounded-2xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.72)] p-4 text-left hover:shadow-[0_12px_24px_rgba(0,0,0,0.24)]"
                       >
                         <p className="text-2xl">{item.icon}</p>
                         <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
-                        <p className="text-sm text-[rgba(29,23,19,0.65)]">{item.note}</p>
+                        <p className="text-sm text-[rgba(214,228,255,0.7)]">{item.note}</p>
                       </motion.button>
                     ))}
                   </div>
@@ -333,18 +333,18 @@ export default function Home() {
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Decris ce que t'as envie de regarder
                   </h2>
-                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
                     Sois precis, vague, ou creatif: cette description guide tout.
                   </p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
                     <label
                       htmlFor="custom-mood"
-                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]"
+                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink)]"
                     >
                       Description libre
                     </label>
-                    <p className="mt-1 text-sm text-[rgba(29,23,19,0.68)]">
+                    <p className="mt-1 text-sm text-[rgba(214,228,255,0.72)]">
                       Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"
                     </p>
                     <div className="mt-3 relative">
@@ -368,14 +368,14 @@ export default function Home() {
                           if (customMood.trim()) toStep("language");
                         }}
                         disabled={!customMood.trim()}
-                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45 shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
+                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-[#041110] disabled:opacity-45 shadow-[0_8px_18px_rgba(61,217,199,0.22)]"
                       >
                         Continuer
                       </button>
                     </div>
                   </div>
 
-                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(29,23,19,0.6)]">
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(214,228,255,0.62)]">
                     Idees rapides
                   </p>
                   <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
@@ -396,12 +396,12 @@ export default function Home() {
                         style={{
                           borderColor:
                             mood === item.value && !customMood
-                              ? "rgba(86,19,30,0.45)"
-                              : "rgba(43,33,28,0.18)",
+                              ? "rgba(61,217,199,0.62)"
+                              : "rgba(194,213,255,0.2)",
                           background:
                             mood === item.value && !customMood
-                              ? "rgba(110,30,42,0.1)"
-                              : "rgba(255,255,255,0.5)",
+                              ? "rgba(61,217,199,0.14)"
+                              : "rgba(8,14,28,0.66)",
                         }}
                       >
                         <span className="block text-xl">{item.icon}</span>
@@ -433,7 +433,7 @@ export default function Home() {
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Quelle langue preferee ?
                   </h2>
-                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
                     Derniere etape: on lance les recommandations.
                   </p>
 
@@ -447,7 +447,7 @@ export default function Home() {
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => pushToResults(item.value)}
-                        className="yt-button rounded-2xl border border-[rgba(15,15,16,0.16)] bg-[rgba(255,255,255,0.9)] p-5 text-center hover:shadow-[0_10px_22px_rgba(15,15,16,0.08)]"
+                        className="yt-button rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.72)] p-5 text-center hover:shadow-[0_10px_22px_rgba(0,0,0,0.24)]"
                       >
                         <p className="text-4xl">{item.flag}</p>
                         <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
@@ -476,15 +476,15 @@ export default function Home() {
                 Comment ca marche
               </p>
               <ul className="mt-4 space-y-4">
-                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
                   <Clock3 size={16} className="mt-0.5 text-[var(--wine)]" />
                   1. Tu choisis la duree de ton repas.
                 </li>
-                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
                   <MessageSquareText size={16} className="mt-0.5 text-[var(--wine)]" />
                   2. Tu decris ton envie du moment.
                 </li>
-                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
                   <Languages size={16} className="mt-0.5 text-[var(--wine)]" />
                   3. Tu choisis la langue et on te sort des recos.
                 </li>
@@ -495,15 +495,15 @@ export default function Home() {
               initial={{ opacity: 0, x: 18 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-[28px] border border-[rgba(15,15,16,0.12)] bg-white/90 text-[var(--charcoal)] p-6"
+              className="rounded-[28px] border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.76)] text-[var(--ink)] p-6"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-[rgba(15,15,16,0.62)] font-semibold">
+              <p className="text-xs uppercase tracking-[0.2em] text-[rgba(214,228,255,0.62)] font-semibold">
                 LetMeWatch
               </p>
               <p className="mt-4 font-serif font-semibold text-3xl leading-tight">
                 Plus de scroll inutile.
               </p>
-              <p className="mt-3 text-sm text-[rgba(15,15,16,0.68)] leading-relaxed">
+              <p className="mt-3 text-sm text-[rgba(214,228,255,0.72)] leading-relaxed">
                 Tu viens manger, pas chercher pendant 10 minutes.
               </p>
             </motion.div>
