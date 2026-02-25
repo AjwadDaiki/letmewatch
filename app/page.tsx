@@ -233,7 +233,7 @@ export default function Home() {
                   <SplitTitle text="T'en as marre de scroller ?" />
 
                   <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
-                    Tu dis juste ton temps, ton ambiance et ta langue. On te propose
+                    Tu donnes ton temps, ta langue et ton style du moment. On te propose
                     directement des videos qui se regardent bien pendant ton repas.
                   </p>
 
@@ -331,7 +331,7 @@ export default function Home() {
                   exit="exit"
                 >
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
-                    Decris ce que tu veux regarder
+                    Decris ce qui te ferait plaisir
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
                     Sois precis, vague, ou creatif: cette description guide tout.
