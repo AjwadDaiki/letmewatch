@@ -88,7 +88,7 @@ function SplitTitle({ text }: { text: string }) {
 function StepProgress({ current }: { current: Step }) {
   const labels = [
     { step: "duration", label: "Temps" },
-    { step: "mood", label: "Mood" },
+    { step: "mood", label: "Ambiance" },
     { step: "language", label: "Langue" },
   ] as const;
 
@@ -216,7 +216,7 @@ export default function Home() {
                   <SplitTitle text="Tu manges. On trouve ta video." />
 
                   <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
-                    Tu dis juste ton temps, ton mood et ta langue. On te propose
+                    Tu dis juste ton temps, ton ambiance et ta langue. On te propose
                     directement des videos qui se regardent bien pendant ton repas.
                   </p>
 
@@ -239,6 +239,19 @@ export default function Home() {
                       <Shuffle size={16} />
                       Mode surprise
                     </motion.button>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {["Resultats en quelques secondes", "Duree adaptee", "Aucune inscription"].map(
+                      (item) => (
+                        <span
+                          key={item}
+                          className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white/85 px-3 py-1 text-xs font-medium text-[rgba(15,15,16,0.72)]"
+                        >
+                          {item}
+                        </span>
+                      )
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -303,7 +316,7 @@ export default function Home() {
                     Decris ce que tu veux regarder
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
-                    Sois precis, vague, ou creatif: l'input libre est prioritaire.
+                    Sois precis, vague, ou creatif: cette description guide tout.
                   </p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
@@ -345,7 +358,7 @@ export default function Home() {
                   </div>
 
                   <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(29,23,19,0.6)]">
-                    Presets rapides
+                    Idees rapides
                   </p>
                   <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {MOODS.map((item, index) => (
@@ -451,7 +464,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <MessageSquareText size={16} className="mt-0.5 text-[var(--wine)]" />
-                  2. Tu decris ce que tu veux regarder.
+                  2. Tu decris ton envie du moment.
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <Languages size={16} className="mt-0.5 text-[var(--wine)]" />

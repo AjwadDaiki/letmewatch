@@ -38,7 +38,7 @@ function formatDuration(seconds: number): string {
 
 function getMoodLabel(mood: string, isSurprise: boolean): string {
   if (isSurprise) return "Surprise";
-  const first = mood.split(" ")[0] || "mood";
+  const first = mood.split(" ")[0] || "ambiance";
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
 
@@ -504,7 +504,7 @@ export default function ResultsClient() {
           </section>
         ) : videos.length === 0 ? (
           <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
-            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour ce mood</p>
+            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour cette ambiance</p>
             <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">
               Essaie le mode surprise pour explorer d'autres pistes.
             </p>
