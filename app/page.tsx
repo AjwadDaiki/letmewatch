@@ -194,9 +194,6 @@ export default function Home() {
 
         <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
           <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
-            <div className="absolute -top-7 -right-6 h-24 w-24 rounded-full border border-[rgba(86,19,30,0.22)]" />
-            <div className="absolute -bottom-7 -left-8 h-32 w-32 rounded-full border border-[rgba(86,19,30,0.18)]" />
-
             {step !== "welcome" && (
               <div className="mb-6">
                 <StepProgress current={step} />
