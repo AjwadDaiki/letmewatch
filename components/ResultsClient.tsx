@@ -36,7 +36,7 @@ function formatDuration(seconds: number): string {
 }
 
 function getMoodLabel(mood: string, isSurprise: boolean): string {
-  if (isSurprise) return "Carte blanche";
+  if (isSurprise) return "Surprise";
   const first = mood.split(" ")[0] || "mood";
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
@@ -363,10 +363,10 @@ export default function ResultsClient() {
               onClick={() => router.push("/")}
               className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--wine)]"
             >
-              <ArrowLeft size={16} /> Retour au menu
+              <ArrowLeft size={16} /> Retour a l'accueil
             </button>
 
-            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">Service en cours</p>
+            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">Resultats</p>
 
             <div className="flex items-center gap-2">
               <button
@@ -389,7 +389,7 @@ export default function ResultsClient() {
                 onClick={handleSurprise}
                 className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(110,30,42,0.3)] bg-[rgba(110,30,42,0.08)] px-3 py-2 text-sm font-semibold text-[var(--wine)]"
               >
-                <Shuffle size={14} /> Carte blanche
+                <Shuffle size={14} /> Mode surprise
               </button>
 
               <button
@@ -421,7 +421,7 @@ export default function ResultsClient() {
               {languageFlag(language)}
             </span>
             {reason && !loading && (
-              <span className="text-[rgba(29,23,19,0.65)]">Selection: {reason}</span>
+              <span className="text-[rgba(29,23,19,0.65)]">Pourquoi ces choix: {reason}</span>
             )}
           </div>
         </header>
@@ -436,7 +436,7 @@ export default function ResultsClient() {
             >
               <div className="rounded-[20px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="font-semibold text-[var(--charcoal)]">Recemment servi</p>
+                  <p className="font-semibold text-[var(--charcoal)]">Recemment regardees</p>
                   <p className="text-xs text-[rgba(29,23,19,0.6)]">Expire apres 7 jours</p>
                 </div>
 
@@ -472,7 +472,7 @@ export default function ResultsClient() {
           <LoadingSkeleton />
         ) : error ? (
           <section className="rounded-[22px] border border-[rgba(110,30,42,0.2)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
-            <p className="font-serif text-3xl text-[var(--wine)]">Service interrompu</p>
+            <p className="font-serif text-3xl text-[var(--wine)]">Une erreur est survenue</p>
             <p className="mt-2 text-sm text-[rgba(29,23,19,0.72)]">{error}</p>
             <button
               onClick={() => fetchVideos()}
@@ -483,13 +483,13 @@ export default function ResultsClient() {
           </section>
         ) : videos.length === 0 ? (
           <section className="rounded-[22px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
-            <p className="font-serif text-3xl text-[var(--charcoal)]">Rien en cuisine pour ce mood</p>
-            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">Lance carte blanche pour trouver une piste inattendue.</p>
+            <p className="font-serif text-3xl text-[var(--charcoal)]">Aucun resultat pour ce mood</p>
+            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">Essaie le mode surprise pour ouvrir d'autres pistes.</p>
             <button
               onClick={handleSurprise}
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
             >
-              <Shuffle size={15} /> Carte blanche
+              <Shuffle size={15} /> Mode surprise
             </button>
           </section>
         ) : (

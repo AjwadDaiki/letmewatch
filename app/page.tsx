@@ -14,7 +14,7 @@ import {
 
 const DURATIONS = [
   { label: "15 min", value: 15, note: "Pause express", icon: "⚡" },
-  { label: "30 min", value: 30, note: "Service classique", icon: "🍽️" },
+  { label: "30 min", value: 30, note: "Format standard", icon: "🍽️" },
   { label: "1h+", value: 65, note: "Je m'installe", icon: "🥂" },
 ];
 
@@ -150,8 +150,8 @@ export default function Home() {
               <UtensilsCrossed size={18} />
             </div>
             <div>
-              <p className="font-serif text-xl leading-none text-[var(--charcoal)]">LetMeEat</p>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--wine)]">Bistro Match Lab</p>
+              <p className="font-serif text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--wine)]">YouTube Match</p>
             </div>
           </div>
           {step !== "welcome" && (
@@ -159,7 +159,7 @@ export default function Home() {
               onClick={() => transitionTo("welcome")}
               className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--charcoal)]"
             >
-              Revenir au menu
+              Retour a l'accueil
             </button>
           )}
         </header>
@@ -179,13 +179,13 @@ export default function Home() {
                   exit="exit"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    Edition du soir
+                    Trouve vite quoi regarder
                   </p>
-                  <SplitTitle text="Le bon plat. La bonne video." />
+                  <SplitTitle text="La bonne video, au bon moment." />
 
                   <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
-                    Tu lances le repas, on te sert des recommandations YouTube qui tombent pile dans
-                    ton timing. Sans scroll infini, sans hesitation.
+                    Dis ce que tu veux regarder et combien de temps tu as. LetMeWatch te propose
+                    des videos YouTube adaptees en quelques secondes.
                   </p>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -195,7 +195,7 @@ export default function Home() {
                       onClick={() => transitionTo("duration")}
                       className="rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2"
                     >
-                      Composer mon service
+                      Trouver mes videos
                       <ChevronRight size={18} />
                     </motion.button>
                     <motion.button
@@ -205,7 +205,7 @@ export default function Home() {
                       className="rounded-2xl border border-[rgba(86,19,30,0.35)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--wine)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
-                      Carte blanche
+                      Mode surprise
                     </motion.button>
                   </div>
 
@@ -224,7 +224,7 @@ export default function Home() {
                     Combien de temps dure ton repas ?
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
-                    On calibre les videos pour terminer juste avec ton assiette.
+                    On ajuste la duree pour que la video colle a ton timing.
                   </p>
 
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -265,10 +265,51 @@ export default function Home() {
                     Quelle ambiance aujourd'hui ?
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
-                    Selectionne un mood ou ecris le tien, on s'occupe du service.
+                    Decris librement ce que tu veux regarder: style, ton, sujet, energie.
                   </p>
 
-                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                  <div className="mt-5 rounded-2xl border border-[rgba(86,19,30,0.3)] bg-[rgba(110,30,42,0.06)] p-4">
+                    <label
+                      htmlFor="custom-mood"
+                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--wine)]"
+                    >
+                      Decris exactement ce que tu veux
+                    </label>
+                    <p className="mt-1 text-sm text-[rgba(29,23,19,0.72)]">
+                      Exemple: "quelque chose de captivant, sans trop parler, 20-30 min"
+                    </p>
+                    <div className="mt-3 relative">
+                      <input
+                        id="custom-mood"
+                        ref={inputRef}
+                        type="text"
+                        value={customMood}
+                        onChange={(e) => {
+                          setCustomMood(e.target.value);
+                          if (e.target.value) setMood(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && customMood.trim()) transitionTo("language");
+                        }}
+                        placeholder="Ecris ton besoin ici, sans contrainte..."
+                        className="w-full rounded-2xl bg-[rgba(255,255,255,0.84)] border border-[rgba(86,19,30,0.38)] px-4 py-4 text-sm outline-none focus:border-[rgba(86,19,30,0.55)]"
+                      />
+                      <button
+                        onClick={() => {
+                          if (customMood.trim()) transitionTo("language");
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45"
+                        disabled={!customMood.trim()}
+                      >
+                        Continuer
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(29,23,19,0.6)]">
+                    Ou choisis un preset rapide
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {MOODS.map((m, index) => (
                       <motion.button
                         key={m.value}
@@ -302,31 +343,6 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="mt-5 relative">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={customMood}
-                      onChange={(e) => {
-                        setCustomMood(e.target.value);
-                        if (e.target.value) setMood(null);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && customMood.trim()) transitionTo("language");
-                      }}
-                      placeholder="Ex: un truc captivant, pas trop bruyant"
-                      className="w-full rounded-2xl bg-[rgba(255,255,255,0.62)] border border-[rgba(43,33,28,0.2)] px-4 py-3.5 text-sm outline-none focus:border-[rgba(86,19,30,0.45)]"
-                    />
-                    {customMood && (
-                      <button
-                        onClick={() => transitionTo("language")}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white"
-                      >
-                        Valider
-                      </button>
-                    )}
-                  </div>
-
                   <button
                     onClick={() => transitionTo("duration")}
                     className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
@@ -340,7 +356,7 @@ export default function Home() {
                 <motion.div key="language" variants={pageVariants} initial="initial" animate="animate" exit="exit">
                   <StepRail current={3} />
                   <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] mt-5 text-[var(--charcoal)]">
-                    Dans quelle langue on sert ?
+                    Quelle langue preferee ?
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">On filtre directement les recommandations.</p>
 
@@ -379,7 +395,7 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               className="bistro-card rounded-[28px] p-6"
             >
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--wine)] font-semibold">Le service</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--wine)] font-semibold">Ce que tu gagnes</p>
               <ul className="mt-4 space-y-4">
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <Clock3 size={16} className="mt-0.5 text-[var(--wine)]" />
@@ -391,7 +407,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <Shuffle size={16} className="mt-0.5 text-[var(--wine)]" />
-                  Mode carte blanche pour sortir de ta zone habituelle.
+                  Mode surprise pour decouvrir des videos inattendues.
                 </li>
               </ul>
             </motion.div>
@@ -402,14 +418,14 @@ export default function Home() {
               transition={{ delay: 0.1 }}
               className="rounded-[28px] bg-[var(--charcoal)] text-[#f4ecdf] p-6"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-[#cfab74] font-semibold">Signature maison</p>
-              <p className="mt-4 font-serif text-3xl leading-tight">"Tu manges, on choisit pour toi."</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#cfab74] font-semibold">LetMeWatch</p>
+              <p className="mt-4 font-serif text-3xl leading-tight">"Decris ton mood, on trouve ta video."</p>
               <p className="mt-3 text-sm text-[#dbc9b1] leading-relaxed">
-                Une reco utile, rapide, et vraiment regardable pendant ton repas. Pas un
-                feed de plus, un vrai concierge.
+                Une reco utile et rapide pour ton repas. Tu peux etre precis, vague, ou
+                creatif: l'input libre est la pour ca.
               </p>
               <div className="mt-6 h-[1px] bg-[rgba(244,236,223,0.2)]" />
-              <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[#b5a086]">LetMeEat Atelier</p>
+              <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[#b5a086]">No scroll, juste des choix utiles</p>
             </motion.div>
           </aside>
         </div>

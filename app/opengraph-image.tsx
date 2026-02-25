@@ -1,7 +1,7 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "LetMeEat — Find the perfect YouTube video for your meal";
+export const alt = "LetMeWatch - Find the perfect YouTube video for your meal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -21,7 +21,6 @@ export default function OGImage() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        {/* Violet blob */}
         <div
           style={{
             position: "absolute",
@@ -34,7 +33,6 @@ export default function OGImage() {
             filter: "blur(80px)",
           }}
         />
-        {/* Rose blob */}
         <div
           style={{
             position: "absolute",
@@ -48,7 +46,6 @@ export default function OGImage() {
           }}
         />
 
-        {/* Icon */}
         <div
           style={{
             display: "flex",
@@ -65,7 +62,6 @@ export default function OGImage() {
           🍽️
         </div>
 
-        {/* Title */}
         <div
           style={{
             display: "flex",
@@ -85,10 +81,9 @@ export default function OGImage() {
           >
             Me
           </span>
-          <span style={{ color: "white" }}>Eat</span>
+          <span style={{ color: "white" }}>Watch</span>
         </div>
 
-        {/* Tagline */}
         <div
           style={{
             fontSize: 28,
@@ -99,10 +94,9 @@ export default function OGImage() {
             marginBottom: 40,
           }}
         >
-          Find the perfect YouTube video to watch while eating — in 10 seconds
+          Find the perfect YouTube video to watch while eating - in 10 seconds
         </div>
 
-        {/* Stats row */}
         <div
           style={{
             display: "flex",

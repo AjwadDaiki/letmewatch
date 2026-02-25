@@ -20,8 +20,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmeeat.vercel.ap
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Find the Perfect YouTube Video to Watch While Eating | LetMeEat",
-    template: "%s | LetMeEat",
+    default: "Find the Perfect YouTube Video to Watch While Eating | LetMeWatch",
+    template: "%s | LetMeWatch",
   },
   description:
     "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds. AI-powered, no account needed.",
@@ -34,12 +34,12 @@ export const metadata: Metadata = {
     "quoi regarder en mangeant",
     "que ver en youtube mientras como",
   ],
-  authors: [{ name: "LetMeEat" }],
-  creator: "LetMeEat",
+  authors: [{ name: "LetMeWatch" }],
+  creator: "LetMeWatch",
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "LetMeEat",
+    siteName: "LetMeWatch",
     title: "Find the Perfect YouTube Video to Watch While Eating",
     description:
       "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds.",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "LetMeEat - Find the perfect YouTube video for your meal",
+        alt: "LetMeWatch - Find the perfect YouTube video for your meal",
       },
     ],
   },
@@ -87,7 +87,7 @@ const schemaOrg = {
     {
       "@type": "WebApplication",
       "@id": `${SITE_URL}/#webapp`,
-      name: "LetMeEat",
+      name: "LetMeWatch",
       url: SITE_URL,
       description:
         "AI-powered YouTube video recommendations for mealtime. Tell us your mood and meal duration - get the perfect video in seconds.",
@@ -114,12 +114,12 @@ const schemaOrg = {
           name: "What should I watch while eating?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "LetMeEat uses AI to find the perfect YouTube video for your meal. Just tell us your mood, how long you're eating, and your language preference - you get 3 perfectly matched videos in seconds.",
+            text: "LetMeWatch uses AI to find the perfect YouTube video for your meal. Just tell us your mood, how long you're eating, and your language preference - you get 3 perfectly matched videos in seconds.",
           },
         },
         {
           "@type": "Question",
-          name: "How does LetMeEat work?",
+          name: "How does LetMeWatch work?",
           acceptedAnswer: {
             "@type": "Answer",
             text: "Answer 3 quick questions (meal duration, mood, language). Our AI generates optimized YouTube search queries and returns the best videos matched to your context. No account needed, no scrolling.",
@@ -127,10 +127,10 @@ const schemaOrg = {
         },
         {
           "@type": "Question",
-          name: "Is LetMeEat free?",
+          name: "Is LetMeWatch free?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes, LetMeEat is completely free. No account, no subscription, no ads.",
+            text: "Yes, LetMeWatch is completely free. No account, no subscription, no ads.",
           },
         },
       ],
