@@ -67,7 +67,7 @@ const pageVariants: Variants = {
 
 function SplitTitle({ text }: { text: string }) {
   return (
-    <h1 className="font-serif text-[clamp(2.2rem,6vw,4.5rem)] leading-[0.95] tracking-tight text-[var(--charcoal)]">
+    <h1 className="font-serif font-semibold text-[clamp(2.15rem,6vw,4.2rem)] leading-[0.95] tracking-tight text-[var(--charcoal)]">
       {text.split(" ").map((word, index) => (
         <motion.span
           key={`${word}-${index}`}
@@ -169,12 +169,15 @@ export default function Home() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center">
+            <motion.div
+              whileHover={{ scale: 1.06, rotate: -4 }}
+              transition={{ type: "spring", stiffness: 360, damping: 20 }}
+              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center shadow-[0_8px_18px_rgba(255,0,51,0.28)]"
+            >
               <Youtube size={18} />
-            </div>
+            </motion.div>
             <div>
-              <p className="font-serif text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--wine)]">YouTube Match</p>
+              <p className="font-serif font-semibold text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
             </div>
           </div>
           {step !== "welcome" && (
@@ -223,7 +226,7 @@ export default function Home() {
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => toStep("duration")}
-                      className="rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2"
+                      className="yt-button rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(255,0,51,0.28)]"
                     >
                       Commencer
                       <ChevronRight size={18} />
@@ -232,7 +235,7 @@ export default function Home() {
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => pushToResults("any", true)}
-                      className="rounded-2xl border border-[rgba(86,19,30,0.35)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--wine)] flex items-center justify-center gap-2"
+                      className="yt-button rounded-2xl border border-[rgba(15,15,16,0.16)] bg-white/80 px-6 py-4 font-semibold text-sm md:text-base text-[var(--charcoal)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
                       Surprise directe
@@ -250,7 +253,7 @@ export default function Home() {
                   animate="center"
                   exit="exit"
                 >
-                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Combien de temps tu as ?
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
@@ -270,10 +273,10 @@ export default function Home() {
                           setDuration(item.value);
                           toStep("mood");
                         }}
-                        className="rounded-2xl border border-[rgba(43,33,28,0.14)] bg-[rgba(255,255,255,0.62)] p-4 text-left"
+                        className="yt-button rounded-2xl border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.88)] p-4 text-left hover:shadow-[0_12px_24px_rgba(15,15,16,0.08)]"
                       >
                         <p className="text-2xl">{item.icon}</p>
-                        <p className="mt-3 font-serif text-2xl text-[var(--charcoal)]">{item.label}</p>
+                        <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
                         <p className="text-sm text-[rgba(29,23,19,0.65)]">{item.note}</p>
                       </motion.button>
                     ))}
@@ -297,21 +300,21 @@ export default function Home() {
                   animate="center"
                   exit="exit"
                 >
-                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Decris ce que tu veux regarder
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
                     Sois precis, vague, ou creatif: l'input libre est prioritaire.
                   </p>
 
-                  <div className="mt-5 rounded-2xl border border-[rgba(86,19,30,0.3)] bg-[rgba(110,30,42,0.06)] p-4">
+                  <div className="yt-input-wrap mt-5 rounded-3xl p-5">
                     <label
                       htmlFor="custom-mood"
-                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--wine)]"
+                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]"
                     >
-                      Brief libre
+                      Description libre
                     </label>
-                    <p className="mt-1 text-sm text-[rgba(29,23,19,0.72)]">
+                    <p className="mt-1 text-sm text-[rgba(29,23,19,0.68)]">
                       Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"
                     </p>
                     <div className="mt-3 relative">
@@ -328,14 +331,14 @@ export default function Home() {
                           if (e.key === "Enter" && customMood.trim()) toStep("language");
                         }}
                         placeholder="Ecris ton besoin ici..."
-                        className="w-full rounded-2xl bg-[rgba(255,255,255,0.84)] border border-[rgba(86,19,30,0.38)] px-4 py-4 text-sm outline-none focus:border-[rgba(86,19,30,0.55)]"
+                        className="yt-input w-full rounded-2xl px-4 py-4 pr-32 text-sm outline-none"
                       />
                       <button
                         onClick={() => {
                           if (customMood.trim()) toStep("language");
                         }}
                         disabled={!customMood.trim()}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45"
+                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45 shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
                       >
                         Continuer
                       </button>
@@ -359,7 +362,7 @@ export default function Home() {
                           setCustomMood("");
                           toStep("language");
                         }}
-                        className="rounded-xl px-3 py-3 text-center border text-sm"
+                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(15,15,16,0.08)]"
                         style={{
                           borderColor:
                             mood === item.value && !customMood
@@ -397,7 +400,7 @@ export default function Home() {
                   animate="center"
                   exit="exit"
                 >
-                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Quelle langue preferee ?
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
@@ -414,10 +417,10 @@ export default function Home() {
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => pushToResults(item.value)}
-                        className="rounded-2xl border border-[rgba(43,33,28,0.18)] bg-[rgba(255,255,255,0.6)] p-5 text-center"
+                        className="yt-button rounded-2xl border border-[rgba(15,15,16,0.16)] bg-[rgba(255,255,255,0.9)] p-5 text-center hover:shadow-[0_10px_22px_rgba(15,15,16,0.08)]"
                       >
                         <p className="text-4xl">{item.flag}</p>
-                        <p className="mt-3 font-serif text-2xl text-[var(--charcoal)]">{item.label}</p>
+                        <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
                       </motion.button>
                     ))}
                   </div>
@@ -462,15 +465,15 @@ export default function Home() {
               initial={{ opacity: 0, x: 18 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-[28px] bg-[var(--charcoal)] text-[#f4ecdf] p-6"
+              className="rounded-[28px] border border-[rgba(15,15,16,0.12)] bg-white/90 text-[var(--charcoal)] p-6"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-[#cfab74] font-semibold">
+              <p className="text-xs uppercase tracking-[0.2em] text-[rgba(15,15,16,0.62)] font-semibold">
                 LetMeWatch
               </p>
-              <p className="mt-4 font-serif text-3xl leading-tight">
-                "Dis ce que tu veux, on te propose mieux."
+              <p className="mt-4 font-serif font-semibold text-3xl leading-tight">
+                Rapide, clair, utile.
               </p>
-              <p className="mt-3 text-sm text-[#dbc9b1] leading-relaxed">
+              <p className="mt-3 text-sm text-[rgba(15,15,16,0.68)] leading-relaxed">
                 Donne ton contexte en quelques mots et lance les recommandations immediatement.
               </p>
             </motion.div>

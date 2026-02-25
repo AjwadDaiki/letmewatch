@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-outfit",
   display: "swap",
 });
 
-const manrope = Manrope({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
@@ -144,7 +144,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${plusJakartaSans.variable}`}>
       <head>
         <script
           type="application/ld+json"

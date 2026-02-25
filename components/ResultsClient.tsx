@@ -85,7 +85,7 @@ function VideoCard({
       exit={{ opacity: 0, x: -50, scale: 0.94, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
       style={{ x, rotate, opacity }}
-      className="group rounded-[22px] border border-[rgba(43,33,28,0.2)] bg-[rgba(255,251,245,0.83)] overflow-hidden shadow-[0_12px_30px_rgba(43,33,28,0.1)]"
+      className="group rounded-[22px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.9)] overflow-hidden shadow-[0_12px_30px_rgba(15,15,16,0.08)]"
     >
       <div className="relative" style={{ aspectRatio: "16/9" }}>
         {isPlaying ? (
@@ -115,7 +115,7 @@ function VideoCard({
                 background: "linear-gradient(180deg, rgba(29,23,19,0.05), rgba(29,23,19,0.35))",
               }}
             >
-              <span className="h-14 w-14 rounded-full bg-[rgba(247,239,225,0.95)] text-[var(--wine)] grid place-content-center shadow-[0_8px_20px_rgba(29,23,19,0.35)] transition-transform group-hover:scale-105">
+              <span className="h-14 w-14 rounded-full bg-white text-[var(--wine)] grid place-content-center shadow-[0_8px_20px_rgba(15,15,16,0.26)] transition-transform group-hover:scale-105">
                 <Play size={22} fill="currentColor" style={{ marginLeft: 2 }} />
               </span>
             </button>
@@ -151,7 +151,7 @@ function VideoCard({
               href={`https://youtube.com/watch?v=${video.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-[rgba(43,33,28,0.15)] p-1.5 text-[rgba(43,33,28,0.7)] hover:text-[var(--charcoal)]"
+              className="yt-button rounded-lg border border-[rgba(15,15,16,0.14)] p-1.5 text-[rgba(15,15,16,0.7)] hover:text-[var(--charcoal)]"
               onClick={(e) => e.stopPropagation()}
               title="Ouvrir sur YouTube"
             >
@@ -163,7 +163,7 @@ function VideoCard({
                 e.stopPropagation();
                 setShowBlacklist(true);
               }}
-              className="rounded-lg border border-[rgba(110,30,42,0.2)] p-1.5 text-[var(--wine)]"
+              className="yt-button rounded-lg border border-[rgba(15,15,16,0.14)] p-1.5 text-[var(--wine)]"
               title="Ne plus voir cette chaine"
             >
               <Ban size={13} />
@@ -213,13 +213,13 @@ function LoadingSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="overflow-hidden rounded-[22px] border border-[rgba(43,33,28,0.14)] bg-[rgba(255,251,245,0.72)]"
+          className="overflow-hidden rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.86)]"
         >
           <div
             style={{
               aspectRatio: "16/9",
               background:
-                "linear-gradient(90deg, rgba(141,45,62,0.08) 25%, rgba(247,239,225,0.8) 50%, rgba(141,45,62,0.08) 75%)",
+                "linear-gradient(90deg, rgba(255,0,51,0.08) 25%, rgba(255,255,255,0.82) 50%, rgba(255,0,51,0.08) 75%)",
               backgroundSize: "200% 100%",
               animation: "shimmer 1.5s infinite",
             }}
@@ -362,7 +362,7 @@ export default function ResultsClient() {
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="mb-6 rounded-[24px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4 md:p-5"
+          className="mb-6 rounded-[24px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.88)] p-4 md:p-5"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
@@ -372,7 +372,7 @@ export default function ResultsClient() {
               <ArrowLeft size={16} /> Revenir
             </button>
 
-            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">
+            <p className="font-serif font-semibold text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">
               Tes recommandations
             </p>
 
@@ -382,7 +382,7 @@ export default function ResultsClient() {
                   setHistory(getHistory());
                   setShowHistory((prev) => !prev);
                 }}
-                className="relative rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 p-2 text-[var(--charcoal)]"
+                className="yt-button relative rounded-xl border border-[rgba(15,15,16,0.14)] bg-white p-2 text-[var(--charcoal)]"
                 title="Historique"
               >
                 <History size={16} />
@@ -395,14 +395,14 @@ export default function ResultsClient() {
 
               <button
                 onClick={handleSurprise}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(110,30,42,0.3)] bg-[rgba(110,30,42,0.08)] px-3 py-2 text-sm font-semibold text-[var(--wine)]"
+                className="yt-button inline-flex items-center gap-1.5 rounded-xl border border-[rgba(15,15,16,0.14)] bg-white px-3 py-2 text-sm font-semibold text-[var(--wine)]"
               >
                 <Shuffle size={14} /> Surprise
               </button>
 
               <button
                 onClick={() => fetchVideos()}
-                className="rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 p-2 text-[var(--charcoal)]"
+                className="yt-button rounded-xl border border-[rgba(15,15,16,0.14)] bg-white p-2 text-[var(--charcoal)]"
                 title="Rafraichir"
               >
                 <RefreshCw size={16} />
@@ -410,7 +410,7 @@ export default function ResultsClient() {
 
               <button
                 onClick={handleShare}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--charcoal)]"
+                className="yt-button inline-flex items-center gap-1.5 rounded-xl border border-[rgba(15,15,16,0.14)] bg-white px-3 py-2 text-sm font-semibold text-[var(--charcoal)]"
               >
                 {shareSuccess ? <Check size={14} /> : <Share2 size={14} />}
                 {shareSuccess ? "Copie" : "Partager"}
@@ -419,13 +419,13 @@ export default function ResultsClient() {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full border border-[rgba(110,30,42,0.25)] bg-[rgba(110,30,42,0.1)] px-3 py-1 font-semibold text-[var(--wine)]">
+            <span className="rounded-full border border-[rgba(255,0,51,0.28)] bg-[rgba(255,0,51,0.08)] px-3 py-1 font-semibold text-[var(--wine)]">
               {duration} min
             </span>
-            <span className="rounded-full border border-[rgba(43,33,28,0.2)] bg-white/65 px-3 py-1 font-semibold text-[var(--charcoal)]">
+            <span className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white px-3 py-1 font-semibold text-[var(--charcoal)]">
               {getMoodLabel(mood, isSurprise)}
             </span>
-            <span className="rounded-full border border-[rgba(43,33,28,0.2)] bg-white/65 px-3 py-1 font-semibold text-[var(--charcoal)]">
+            <span className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white px-3 py-1 font-semibold text-[var(--charcoal)]">
               {languageFlag(language)}
             </span>
             {reason && !loading && (
@@ -442,7 +442,7 @@ export default function ResultsClient() {
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               className="overflow-hidden"
             >
-              <div className="rounded-[20px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4">
+              <div className="rounded-[20px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.9)] p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="font-semibold text-[var(--charcoal)]">Recemment regardees</p>
                   <p className="text-xs text-[rgba(29,23,19,0.6)]">Expire apres 7 jours</p>
@@ -463,7 +463,7 @@ export default function ResultsClient() {
                         <img
                           src={v.thumbnail}
                           alt={v.title}
-                          className="w-full rounded-lg border border-[rgba(43,33,28,0.12)]"
+                          className="w-full rounded-lg border border-[rgba(15,15,16,0.12)]"
                           style={{ aspectRatio: "16/9", objectFit: "cover" }}
                         />
                         <span className="mt-1 block line-clamp-2 text-xs text-[rgba(29,23,19,0.7)]">
@@ -482,7 +482,7 @@ export default function ResultsClient() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08, duration: 0.3 }}
-          className="mb-4 rounded-xl border border-[rgba(43,33,28,0.12)] bg-[rgba(255,251,245,0.74)] px-4 py-2.5 text-xs text-[rgba(29,23,19,0.72)] flex items-center gap-2"
+          className="mb-4 rounded-xl border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.86)] px-4 py-2.5 text-xs text-[rgba(29,23,19,0.72)] flex items-center gap-2"
         >
           <MousePointer2 size={14} />
           Clique pour lire, glisse une carte a gauche pour passer, utilise l'icone interdiction
@@ -492,25 +492,25 @@ export default function ResultsClient() {
         {loading ? (
           <LoadingSkeleton />
         ) : error ? (
-          <section className="rounded-[22px] border border-[rgba(110,30,42,0.2)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
-            <p className="font-serif text-3xl text-[var(--wine)]">Une erreur est survenue</p>
+          <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
+            <p className="font-serif font-semibold text-3xl text-[var(--wine)]">Une erreur est survenue</p>
             <p className="mt-2 text-sm text-[rgba(29,23,19,0.72)]">{error}</p>
             <button
               onClick={() => fetchVideos()}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
+              className="yt-button mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
             >
               <RefreshCw size={15} /> Reessayer
             </button>
           </section>
         ) : videos.length === 0 ? (
-          <section className="rounded-[22px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
-            <p className="font-serif text-3xl text-[var(--charcoal)]">Aucun resultat pour ce mood</p>
+          <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
+            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour ce mood</p>
             <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">
               Essaie le mode surprise pour explorer d'autres pistes.
             </p>
             <button
               onClick={handleSurprise}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
+              className="yt-button mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
             >
               <Shuffle size={15} /> Mode surprise
             </button>
