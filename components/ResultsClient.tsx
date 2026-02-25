@@ -9,6 +9,7 @@ import {
   Check,
   ExternalLink,
   History,
+  MousePointer2,
   Play,
   RefreshCw,
   Share2,
@@ -79,7 +80,7 @@ function VideoCard({
         if (Math.abs(info.offset.x) > 85) onReject(video.id);
       }}
       layout
-      initial={{ opacity: 0, y: 18, scale: 0.97 }}
+      initial={{ opacity: 0, y: 24, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, x: -50, scale: 0.94, transition: { duration: 0.2 } }}
       transition={{ duration: 0.3 }}
@@ -110,7 +111,9 @@ function VideoCard({
             <button
               onClick={handlePlay}
               className="absolute inset-0 grid place-content-center"
-              style={{ background: "linear-gradient(180deg, rgba(29,23,19,0.05), rgba(29,23,19,0.35))" }}
+              style={{
+                background: "linear-gradient(180deg, rgba(29,23,19,0.05), rgba(29,23,19,0.35))",
+              }}
             >
               <span className="h-14 w-14 rounded-full bg-[rgba(247,239,225,0.95)] text-[var(--wine)] grid place-content-center shadow-[0_8px_20px_rgba(29,23,19,0.35)] transition-transform group-hover:scale-105">
                 <Play size={22} fill="currentColor" style={{ marginLeft: 2 }} />
@@ -130,16 +133,14 @@ function VideoCard({
             >
               <X size={14} />
             </button>
-
-            <span className="absolute left-2 bottom-2 rounded-md bg-[rgba(247,239,225,0.9)] px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-[var(--wine)] opacity-0 transition-opacity group-hover:opacity-100">
-              swipe gauche
-            </span>
           </>
         )}
       </div>
 
       <div className="p-4">
-        <h3 className="line-clamp-2 min-h-10 font-semibold text-[14px] text-[var(--charcoal)]">{video.title}</h3>
+        <h3 className="line-clamp-2 min-h-10 font-semibold text-[14px] text-[var(--charcoal)]">
+          {video.title}
+        </h3>
         <div className="mt-3 flex items-center justify-between gap-2">
           <span className="truncate text-xs text-[rgba(43,33,28,0.7)]" title={video.channelTitle}>
             {video.channelTitle}
@@ -357,16 +358,23 @@ export default function ResultsClient() {
   return (
     <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-6 rounded-[24px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4 md:p-5">
+        <motion.header
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="mb-6 rounded-[24px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4 md:p-5"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               onClick={() => router.push("/")}
               className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--wine)]"
             >
-              <ArrowLeft size={16} /> Retour a l'accueil
+              <ArrowLeft size={16} /> Revenir
             </button>
 
-            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">Resultats</p>
+            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">
+              Tes recommandations
+            </p>
 
             <div className="flex items-center gap-2">
               <button
@@ -389,7 +397,7 @@ export default function ResultsClient() {
                 onClick={handleSurprise}
                 className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(110,30,42,0.3)] bg-[rgba(110,30,42,0.08)] px-3 py-2 text-sm font-semibold text-[var(--wine)]"
               >
-                <Shuffle size={14} /> Mode surprise
+                <Shuffle size={14} /> Surprise
               </button>
 
               <button
@@ -424,7 +432,7 @@ export default function ResultsClient() {
               <span className="text-[rgba(29,23,19,0.65)]">Pourquoi ces choix: {reason}</span>
             )}
           </div>
-        </header>
+        </motion.header>
 
         <AnimatePresence>
           {showHistory && (
@@ -441,7 +449,7 @@ export default function ResultsClient() {
                 </div>
 
                 {history.length === 0 ? (
-                  <p className="text-sm text-[rgba(29,23,19,0.65)]">Aucune video regarde cette semaine.</p>
+                  <p className="text-sm text-[rgba(29,23,19,0.65)]">Aucune video regardee cette semaine.</p>
                 ) : (
                   <div className="flex gap-3 overflow-x-auto pb-1">
                     {history.slice(0, 8).map((v) => (
@@ -458,7 +466,9 @@ export default function ResultsClient() {
                           className="w-full rounded-lg border border-[rgba(43,33,28,0.12)]"
                           style={{ aspectRatio: "16/9", objectFit: "cover" }}
                         />
-                        <span className="mt-1 block line-clamp-2 text-xs text-[rgba(29,23,19,0.7)]">{v.title}</span>
+                        <span className="mt-1 block line-clamp-2 text-xs text-[rgba(29,23,19,0.7)]">
+                          {v.title}
+                        </span>
                       </a>
                     ))}
                   </div>
@@ -467,6 +477,17 @@ export default function ResultsClient() {
             </motion.section>
           )}
         </AnimatePresence>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, duration: 0.3 }}
+          className="mb-4 rounded-xl border border-[rgba(43,33,28,0.12)] bg-[rgba(255,251,245,0.74)] px-4 py-2.5 text-xs text-[rgba(29,23,19,0.72)] flex items-center gap-2"
+        >
+          <MousePointer2 size={14} />
+          Clique pour lire, glisse une carte a gauche pour passer, utilise l'icone interdiction
+          pour masquer une chaine.
+        </motion.div>
 
         {loading ? (
           <LoadingSkeleton />
@@ -484,7 +505,9 @@ export default function ResultsClient() {
         ) : videos.length === 0 ? (
           <section className="rounded-[22px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
             <p className="font-serif text-3xl text-[var(--charcoal)]">Aucun resultat pour ce mood</p>
-            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">Essaie le mode surprise pour ouvrir d'autres pistes.</p>
+            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">
+              Essaie le mode surprise pour explorer d'autres pistes.
+            </p>
             <button
               onClick={handleSurprise}
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
@@ -506,12 +529,6 @@ export default function ResultsClient() {
               ))}
             </AnimatePresence>
           </motion.section>
-        )}
-
-        {!loading && videos.length > 0 && (
-          <p className="mt-8 text-center text-xs uppercase tracking-[0.16em] text-[rgba(29,23,19,0.58)]">
-            Swipe gauche ou bouton X pour passer - bouton interdit pour blacklister
-          </p>
         )}
       </div>
     </main>
