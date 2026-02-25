@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  X,
-  Share2,
-  Shuffle,
   ArrowLeft,
-  ExternalLink,
   Ban,
+  Check,
+  ExternalLink,
+  History,
   Play,
   RefreshCw,
-  History,
-  Check,
+  Share2,
+  Shuffle,
+  X,
 } from "lucide-react";
-import { getBlacklist, addToBlacklist, getHistory, addToHistory } from "@/lib/storage";
+import { addToBlacklist, addToHistory, getBlacklist, getHistory } from "@/lib/storage";
 import type { VideoItem } from "@/lib/storage";
 
 interface Video {
@@ -27,29 +27,25 @@ interface Video {
   duration: number;
 }
 
-function formatDuration(s: number): string {
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-  return `${m}:${String(sec).padStart(2, "0")}`;
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function getMoodEmoji(mood: string): string {
-  if (mood.includes("funny") || mood.includes("comedy")) return "😂";
-  if (mood.includes("chill") || mood.includes("calm")) return "😌";
-  if (mood.includes("educational") || mood.includes("documentary")) return "🧠";
-  if (mood.includes("gaming")) return "🎮";
-  if (mood.includes("food") || mood.includes("cooking")) return "🍜";
-  if (mood.includes("cinema") || mood.includes("movie")) return "🎬";
-  if (mood.includes("travel") || mood.includes("nature")) return "🌍";
-  if (mood.includes("music")) return "🎵";
-  if (mood.includes("science") || mood.includes("technology")) return "🔬";
-  if (mood === "surprise") return "🎲";
-  return "✨";
+function getMoodLabel(mood: string, isSurprise: boolean): string {
+  if (isSurprise) return "Carte blanche";
+  const first = mood.split(" ")[0] || "mood";
+  return first.charAt(0).toUpperCase() + first.slice(1);
 }
 
-// ─── VIDEO CARD ───────────────────────────────────────────────────────────────
+function languageFlag(language: string): string {
+  if (language === "fr") return "🇫🇷";
+  if (language === "en") return "🇬🇧";
+  return "🌐";
+}
 
 function VideoCard({
   video,
@@ -64,9 +60,10 @@ function VideoCard({
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showBlacklist, setShowBlacklist] = useState(false);
+
   const x = useMotionValue(0);
-  const opacity = useTransform(x, [-120, -60, 0, 60, 120], [0, 0.5, 1, 0.5, 0]);
-  const rotate = useTransform(x, [-120, 120], [-8, 8]);
+  const rotate = useTransform(x, [-120, 120], [-5, 5]);
+  const opacity = useTransform(x, [-150, -30, 0, 30, 150], [0, 0.85, 1, 0.85, 0]);
 
   const handlePlay = () => {
     onPlay(video);
@@ -74,159 +71,99 @@ function VideoCard({
   };
 
   return (
-    <motion.div
-      style={{ x, rotate, opacity, background: "#16213E", border: "1px solid rgba(255,255,255,0.06)" }}
+    <motion.article
       drag="x"
+      dragElastic={0.18}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.2}
       onDragEnd={(_, info) => {
-        if (Math.abs(info.offset.x) > 80) {
-          onReject(video.id);
-        }
+        if (Math.abs(info.offset.x) > 85) onReject(video.id);
       }}
       layout
-      initial={{ opacity: 0, y: 24, scale: 0.97 }}
+      initial={{ opacity: 0, y: 18, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, x: -60, scale: 0.9, transition: { duration: 0.25 } }}
-      transition={{ duration: 0.35 }}
-      className="group relative rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing"
-      whileHover={{
-        borderColor: "rgba(108,99,255,0.35)",
-        boxShadow: "0 0 30px rgba(108,99,255,0.1)",
-        y: -2,
-      }}
+      exit={{ opacity: 0, x: -50, scale: 0.94, transition: { duration: 0.2 } }}
+      transition={{ duration: 0.3 }}
+      style={{ x, rotate, opacity }}
+      className="group rounded-[22px] border border-[rgba(43,33,28,0.2)] bg-[rgba(255,251,245,0.83)] overflow-hidden shadow-[0_12px_30px_rgba(43,33,28,0.1)]"
     >
-      {/* Thumbnail / Player */}
-      <div className="relative" style={{ aspectRatio: "16/9", background: "#0F1C3F" }}>
+      <div className="relative" style={{ aspectRatio: "16/9" }}>
         {isPlaying ? (
           <iframe
             src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
             allow="autoplay; encrypted-media; fullscreen"
             allowFullScreen
-            className="w-full h-full"
+            className="h-full w-full"
             style={{ border: "none" }}
           />
         ) : (
           <>
-            {/* Thumbnail */}
             <img
               src={video.thumbnail}
               alt={video.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
               }}
               draggable={false}
             />
 
-            {/* Play button overlay */}
             <button
               onClick={handlePlay}
-              className="absolute inset-0 flex items-center justify-center cursor-pointer play-overlay"
-              style={{ background: "transparent" }}
+              className="absolute inset-0 grid place-content-center"
+              style={{ background: "linear-gradient(180deg, rgba(29,23,19,0.05), rgba(29,23,19,0.35))" }}
             >
-              <span className="play-icon w-14 h-14 rounded-full flex items-center justify-center"
-                style={{
-                  background: "rgba(255,255,255,0.95)",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-                }}>
-                <Play size={22} fill="#1A1A2E" color="#1A1A2E" style={{ marginLeft: 3 }} />
+              <span className="h-14 w-14 rounded-full bg-[rgba(247,239,225,0.95)] text-[var(--wine)] grid place-content-center shadow-[0_8px_20px_rgba(29,23,19,0.35)] transition-transform group-hover:scale-105">
+                <Play size={22} fill="currentColor" style={{ marginLeft: 2 }} />
               </span>
             </button>
 
-            {/* Duration badge */}
-            <div
-              className="absolute bottom-2 right-2 px-2 py-0.5 rounded text-xs font-bold text-white"
-              style={{ background: "rgba(0,0,0,0.8)" }}
-            >
+            <span className="absolute right-2 bottom-2 rounded-md bg-[rgba(29,23,19,0.85)] px-2 py-0.5 text-xs font-semibold text-[#f4ecdf]">
               {formatDuration(video.duration)}
-            </div>
+            </span>
 
-            {/* Reject button */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.7 }}
-              whileHover={{ scale: 1.1 }}
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 onReject(video.id);
               }}
-              className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100"
-              style={{ background: "rgba(0,0,0,0.6)" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.background = "#FF6584")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.background =
-                  "rgba(0,0,0,0.6)")
-              }
+              className="absolute right-2 top-2 h-8 w-8 rounded-full bg-[rgba(29,23,19,0.55)] text-[#f4ecdf] grid place-content-center opacity-0 transition-opacity group-hover:opacity-100"
             >
               <X size={14} />
-            </motion.button>
+            </button>
 
-            {/* Swipe hint */}
-            <div
-              className="absolute bottom-2 left-2 text-xs rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: "rgba(0,0,0,0.5)", color: "#8892A4" }}
-            >
-              swipe ←
-            </div>
+            <span className="absolute left-2 bottom-2 rounded-md bg-[rgba(247,239,225,0.9)] px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-[var(--wine)] opacity-0 transition-opacity group-hover:opacity-100">
+              swipe gauche
+            </span>
           </>
         )}
       </div>
 
-      {/* Card body */}
       <div className="p-4">
-        <h3
-          className="font-semibold text-sm leading-snug mb-2 text-white line-clamp-2"
-          style={{ minHeight: "2.5rem" }}
-        >
-          {video.title}
-        </h3>
-
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className="text-xs truncate flex-1"
-            style={{ color: "#8892A4" }}
-            title={video.channelTitle}
-          >
+        <h3 className="line-clamp-2 min-h-10 font-semibold text-[14px] text-[var(--charcoal)]">{video.title}</h3>
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span className="truncate text-xs text-[rgba(43,33,28,0.7)]" title={video.channelTitle}>
             {video.channelTitle}
           </span>
 
-          <div className="flex items-center gap-1 shrink-0">
-            {/* Watch on YouTube */}
+          <div className="flex items-center gap-1">
             <a
               href={`https://youtube.com/watch?v=${video.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: "#8892A4" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = "white")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = "#8892A4")
-              }
-              title="Ouvrir sur YouTube"
+              className="rounded-lg border border-[rgba(43,33,28,0.15)] p-1.5 text-[rgba(43,33,28,0.7)] hover:text-[var(--charcoal)]"
               onClick={(e) => e.stopPropagation()}
+              title="Ouvrir sur YouTube"
             >
               <ExternalLink size={13} />
             </a>
 
-            {/* Blacklist */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowBlacklist(true);
               }}
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: "#8892A4" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = "#FF6584")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = "#8892A4")
-              }
-              title="Ne plus voir cette chaîne"
+              className="rounded-lg border border-[rgba(110,30,42,0.2)] p-1.5 text-[var(--wine)]"
+              title="Ne plus voir cette chaine"
             >
               <Ban size={13} />
             </button>
@@ -234,19 +171,16 @@ function VideoCard({
         </div>
       </div>
 
-      {/* Blacklist confirm overlay */}
       <AnimatePresence>
         {showBlacklist && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-5"
-            style={{ background: "rgba(22,33,62,0.97)" }}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[rgba(29,23,19,0.93)] p-5 text-[#f4ecdf]"
           >
-            <p className="text-white text-sm text-center font-medium leading-relaxed">
-              Ne plus jamais voir{" "}
-              <span style={{ color: "#FF6584" }}>{video.channelTitle}</span> ?
+            <p className="text-center text-sm leading-relaxed">
+              Retirer definitivement <span className="text-[#e9b2b8]">{video.channelTitle}</span> ?
             </p>
             <div className="flex gap-3">
               <button
@@ -254,26 +188,13 @@ function VideoCard({
                   onBlacklist(video);
                   setShowBlacklist(false);
                 }}
-                className="px-4 py-2 rounded-xl text-white text-xs font-semibold transition-opacity hover:opacity-90"
-                style={{ background: "#FF6584" }}
+                className="rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white"
               >
                 Blacklister
               </button>
               <button
                 onClick={() => setShowBlacklist(false)}
-                className="px-4 py-2 rounded-xl text-white text-xs font-semibold transition-colors"
-                style={{
-                  background: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    "rgba(255,255,255,0.15)")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    "rgba(255,255,255,0.1)")
-                }
+                className="rounded-xl border border-[rgba(247,239,225,0.25)] px-4 py-2 text-xs font-semibold"
               >
                 Annuler
               </button>
@@ -281,108 +202,44 @@ function VideoCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </motion.article>
   );
 }
-
-// ─── LOADING SKELETON ────────────────────────────────────────────────────────
 
 function LoadingSkeleton() {
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#16213E", border: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            <div
-              className="w-full"
-              style={{
-                aspectRatio: "16/9",
-                background: "linear-gradient(90deg, #0F1C3F 25%, #16213E 50%, #0F1C3F 75%)",
-                backgroundSize: "200% 100%",
-                animation: "shimmer 1.6s infinite",
-              }}
-            />
-            <div className="p-4 space-y-3">
-              <div
-                className="h-4 rounded-lg"
-                style={{
-                  background:
-                    "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 75%)",
-                  backgroundSize: "200% 100%",
-                  animation: "shimmer 1.6s infinite",
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              />
-              <div
-                className="h-4 rounded-lg"
-                style={{
-                  width: "70%",
-                  background:
-                    "linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 75%)",
-                  backgroundSize: "200% 100%",
-                  animation: "shimmer 1.6s infinite",
-                  animationDelay: `${i * 0.15 + 0.1}s`,
-                }}
-              />
-              <div
-                className="h-3 rounded-lg"
-                style={{
-                  width: "45%",
-                  background: "rgba(255,255,255,0.04)",
-                }}
-              />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center justify-center gap-2 mt-8 text-sm"
-        style={{ color: "#8892A4" }}
-      >
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="overflow-hidden rounded-[22px] border border-[rgba(43,33,28,0.14)] bg-[rgba(255,251,245,0.72)]"
+        >
+          <div
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "#6C63FF",
-            }}
-            animate={{ y: [0, -8, 0] }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-              delay: i * 0.2,
-              ease: "easeInOut",
+              aspectRatio: "16/9",
+              background:
+                "linear-gradient(90deg, rgba(141,45,62,0.08) 25%, rgba(247,239,225,0.8) 50%, rgba(141,45,62,0.08) 75%)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 1.5s infinite",
             }}
           />
-        ))}
-        <span className="ml-1">L'IA cherche la vidéo parfaite…</span>
-      </motion.div>
-
+          <div className="space-y-2 p-4">
+            <div className="h-4 rounded bg-[rgba(43,33,28,0.1)]" />
+            <div className="h-4 w-3/4 rounded bg-[rgba(43,33,28,0.08)]" />
+            <div className="h-3 w-1/3 rounded bg-[rgba(43,33,28,0.06)]" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
-
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export default function ResultsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const mood = searchParams.get("mood") || "interesting";
-  const duration = parseInt(searchParams.get("duration") || "30");
+  const duration = parseInt(searchParams.get("duration") || "30", 10);
   const language = searchParams.get("language") || "any";
   const isSurprise = searchParams.get("surprise") === "true";
 
@@ -424,20 +281,19 @@ export default function ResultsClient() {
         }
 
         const data = await res.json();
-        const filtered = (data.videos || []).filter(
-          (v: Video) => !rejectedIds.includes(v.id)
-        );
+        const filtered = (data.videos || []).filter((v: Video) => !rejectedIds.includes(v.id));
 
         setAllVideos(filtered);
         setVideos(filtered.slice(0, 3));
         setReason(data.reason || "");
-      } catch (err: any) {
-        setError(err.message || "Une erreur est survenue");
+      } catch (err: unknown) {
+        if (err instanceof Error) setError(err.message);
+        else setError("Une erreur est survenue");
       } finally {
         setLoading(false);
       }
     },
-    [mood, duration, language, isSurprise]
+    [duration, isSurprise, language, mood]
   );
 
   useEffect(() => {
@@ -446,11 +302,8 @@ export default function ResultsClient() {
 
   const handleReject = (videoId: string) => {
     const remaining = videos.filter((v) => v.id !== videoId);
-    const rejectedSet = videos
-      .filter((v) => v.id === videoId)
-      .map((v) => v.id);
+    const rejectedSet = videos.filter((v) => v.id === videoId).map((v) => v.id);
 
-    // Try to replace from allVideos pool
     const usedIds = new Set([...remaining.map((v) => v.id), ...rejectedSet]);
     const nextVideo = allVideos.find((v) => !usedIds.has(v.id));
 
@@ -458,16 +311,12 @@ export default function ResultsClient() {
       setVideos([...remaining, nextVideo]);
     } else {
       setVideos(remaining);
-      // Fetch more if we're running low
-      if (remaining.length < 2) {
-        fetchVideos([...rejectedSet]);
-      }
+      if (remaining.length < 2) fetchVideos([...rejectedSet]);
     }
   };
 
   const handleBlacklist = (video: Video) => {
     addToBlacklist(video.channelId);
-    // Remove all videos from this channel
     setVideos((prev) => prev.filter((v) => v.channelId !== video.channelId));
     setAllVideos((prev) => prev.filter((v) => v.channelId !== video.channelId));
   };
@@ -486,13 +335,12 @@ export default function ResultsClient() {
   };
 
   const handleShare = async () => {
-    const url = window.location.href;
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(window.location.href);
       setShareSuccess(true);
-      setTimeout(() => setShareSuccess(false), 2500);
+      window.setTimeout(() => setShareSuccess(false), 2200);
     } catch {
-      // Fallback: select text
+      setShareSuccess(false);
     }
   };
 
@@ -507,243 +355,93 @@ export default function ResultsClient() {
   };
 
   return (
-    <main
-      className="min-h-screen relative overflow-hidden"
-      style={{ background: "#1A1A2E" }}
-    >
-      {/* Ambient blobs */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "-20%",
-          left: "-10%",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "#6C63FF",
-          opacity: 0.06,
-          filter: "blur(120px)",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: "-20%",
-          right: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background: "#FF6584",
-          opacity: 0.06,
-          filter: "blur(100px)",
-        }}
-      />
-
-      <div className="relative max-w-6xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-sm transition-colors"
-            style={{ color: "#8892A4" }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "white")
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "#8892A4")
-            }
-          >
-            <ArrowLeft size={16} />
-            Retour
-          </button>
-
-          {/* Logo */}
-          <span className="text-xl font-black">
-            <span className="text-white">Let</span>
-            <span
-              style={{
-                background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Me
-            </span>
-            <span className="text-white">Eat</span>
-          </span>
-
-          <div className="flex items-center gap-2">
-            {/* History */}
+    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-6 rounded-[24px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4 md:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <button
-              onClick={() => {
-                setHistory(getHistory());
-                setShowHistory(!showHistory);
-              }}
-              className="p-2 rounded-xl transition-colors relative"
-              style={{
-                color: showHistory ? "#6C63FF" : "#8892A4",
-                background: showHistory ? "rgba(108,99,255,0.1)" : "transparent",
-                border: "1px solid",
-                borderColor: showHistory
-                  ? "rgba(108,99,255,0.3)"
-                  : "rgba(255,255,255,0.08)",
-              }}
-              title="Historique"
+              onClick={() => router.push("/")}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--wine)]"
             >
-              <History size={16} />
-              {history.length > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white flex items-center justify-center text-xs font-bold"
-                  style={{ background: "#6C63FF", fontSize: 9 }}
-                >
-                  {history.length}
-                </span>
-              )}
+              <ArrowLeft size={16} /> Retour au menu
             </button>
 
-            {/* Surprise */}
-            <button
-              onClick={handleSurprise}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
-              style={{
-                border: "1px solid rgba(255,101,132,0.3)",
-                color: "#FF6584",
-                background: "rgba(255,101,132,0.05)",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = "rgba(255,101,132,0.12)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = "rgba(255,101,132,0.05)";
-              }}
-            >
-              <Shuffle size={14} />
-              Surprise
-            </button>
+            <p className="font-serif text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">Service en cours</p>
 
-            {/* Refresh */}
-            <button
-              onClick={() => fetchVideos()}
-              className="p-2 rounded-xl transition-colors"
-              style={{
-                color: "#8892A4",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.color = "white";
-                el.style.borderColor = "rgba(255,255,255,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.color = "#8892A4";
-                el.style.borderColor = "rgba(255,255,255,0.08)";
-              }}
-              title="Nouvelles suggestions"
-            >
-              <RefreshCw size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setHistory(getHistory());
+                  setShowHistory((prev) => !prev);
+                }}
+                className="relative rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 p-2 text-[var(--charcoal)]"
+                title="Historique"
+              >
+                <History size={16} />
+                {history.length > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-4 w-4 place-content-center rounded-full bg-[var(--wine)] text-[9px] font-bold text-white">
+                    {history.length}
+                  </span>
+                )}
+              </button>
 
-            {/* Share */}
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors"
-              style={{
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: shareSuccess ? "#6C63FF" : "#8892A4",
-                borderColor: shareSuccess ? "rgba(108,99,255,0.3)" : "rgba(255,255,255,0.08)",
-              }}
-            >
-              {shareSuccess ? <Check size={14} /> : <Share2 size={14} />}
-              {shareSuccess ? "Copié !" : "Partager"}
-            </button>
+              <button
+                onClick={handleSurprise}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(110,30,42,0.3)] bg-[rgba(110,30,42,0.08)] px-3 py-2 text-sm font-semibold text-[var(--wine)]"
+              >
+                <Shuffle size={14} /> Carte blanche
+              </button>
+
+              <button
+                onClick={() => fetchVideos()}
+                className="rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 p-2 text-[var(--charcoal)]"
+                title="Rafraichir"
+              >
+                <RefreshCw size={16} />
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[rgba(43,33,28,0.16)] bg-white/50 px-3 py-2 text-sm font-semibold text-[var(--charcoal)]"
+              >
+                {shareSuccess ? <Check size={14} /> : <Share2 size={14} />}
+                {shareSuccess ? "Copie" : "Partager"}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Context tags */}
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
-          <span
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
-            style={{
-              background: "rgba(108,99,255,0.15)",
-              border: "1px solid rgba(108,99,255,0.25)",
-              color: "#6C63FF",
-            }}
-          >
-            <span>⏱</span> {duration} min
-          </span>
-
-          <span
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
-            style={{
-              background: isSurprise
-                ? "rgba(255,101,132,0.15)"
-                : "rgba(255,255,255,0.06)",
-              border: isSurprise
-                ? "1px solid rgba(255,101,132,0.25)"
-                : "1px solid rgba(255,255,255,0.08)",
-              color: isSurprise ? "#FF6584" : "#A0AEC0",
-            }}
-          >
-            {getMoodEmoji(mood)}{" "}
-            {isSurprise
-              ? "Mode Surprise"
-              : mood.split(" ")[0].charAt(0).toUpperCase() +
-                mood.split(" ")[0].slice(1)}
-          </span>
-
-          <span
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold"
-            style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "#A0AEC0",
-            }}
-          >
-            {language === "fr" ? "🇫🇷" : language === "en" ? "🇬🇧" : "🌐"}
-          </span>
-
-          {reason && !loading && (
-            <span
-              className="text-xs ml-1 hidden sm:inline"
-              style={{ color: "#6B7280" }}
-            >
-              — {reason}
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="rounded-full border border-[rgba(110,30,42,0.25)] bg-[rgba(110,30,42,0.1)] px-3 py-1 font-semibold text-[var(--wine)]">
+              {duration} min
             </span>
-          )}
-        </div>
+            <span className="rounded-full border border-[rgba(43,33,28,0.2)] bg-white/65 px-3 py-1 font-semibold text-[var(--charcoal)]">
+              {getMoodLabel(mood, isSurprise)}
+            </span>
+            <span className="rounded-full border border-[rgba(43,33,28,0.2)] bg-white/65 px-3 py-1 font-semibold text-[var(--charcoal)]">
+              {languageFlag(language)}
+            </span>
+            {reason && !loading && (
+              <span className="text-[rgba(29,23,19,0.65)]">Selection: {reason}</span>
+            )}
+          </div>
+        </header>
 
-        {/* History panel */}
         <AnimatePresence>
           {showHistory && (
-            <motion.div
+            <motion.section
               initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-              animate={{ opacity: 1, height: "auto", marginBottom: 24 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               className="overflow-hidden"
             >
-              <div
-                className="p-4 rounded-2xl"
-                style={{
-                  background: "#16213E",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-white">
-                    Récemment regardé
-                  </h3>
-                  <span className="text-xs" style={{ color: "#6B7280" }}>
-                    Effacé après 7 jours
-                  </span>
+              <div className="rounded-[20px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="font-semibold text-[var(--charcoal)]">Recemment servi</p>
+                  <p className="text-xs text-[rgba(29,23,19,0.6)]">Expire apres 7 jours</p>
                 </div>
+
                 {history.length === 0 ? (
-                  <p className="text-xs" style={{ color: "#6B7280" }}>
-                    Aucune vidéo regardée cette semaine
-                  </p>
+                  <p className="text-sm text-[rgba(29,23,19,0.65)]">Aucune video regarde cette semaine.</p>
                 ) : (
                   <div className="flex gap-3 overflow-x-auto pb-1">
                     {history.slice(0, 8).map((v) => (
@@ -752,82 +450,50 @@ export default function ResultsClient() {
                         href={`https://youtube.com/watch?v=${v.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shrink-0 flex flex-col gap-1 group"
-                        style={{ width: 100 }}
+                        className="w-[112px] shrink-0"
                       >
-                        <div className="rounded-lg overflow-hidden" style={{ aspectRatio: "16/9" }}>
-                          <img
-                            src={v.thumbnail}
-                            alt={v.title}
-                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                          />
-                        </div>
-                        <span
-                          className="text-xs leading-tight line-clamp-2"
-                          style={{ color: "#8892A4" }}
-                        >
-                          {v.title}
-                        </span>
+                        <img
+                          src={v.thumbnail}
+                          alt={v.title}
+                          className="w-full rounded-lg border border-[rgba(43,33,28,0.12)]"
+                          style={{ aspectRatio: "16/9", objectFit: "cover" }}
+                        />
+                        <span className="mt-1 block line-clamp-2 text-xs text-[rgba(29,23,19,0.7)]">{v.title}</span>
                       </a>
                     ))}
                   </div>
                 )}
               </div>
-            </motion.div>
+            </motion.section>
           )}
         </AnimatePresence>
 
-        {/* Main content */}
         {loading ? (
           <LoadingSkeleton />
         ) : error ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20"
-          >
-            <p className="mb-2 text-lg" style={{ color: "#FF6584" }}>
-              😕 Oops, quelque chose s'est mal passé
-            </p>
-            <p className="text-sm mb-6" style={{ color: "#6B7280" }}>
-              {error}
-            </p>
+          <section className="rounded-[22px] border border-[rgba(110,30,42,0.2)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
+            <p className="font-serif text-3xl text-[var(--wine)]">Service interrompu</p>
+            <p className="mt-2 text-sm text-[rgba(29,23,19,0.72)]">{error}</p>
             <button
               onClick={() => fetchVideos()}
-              className="px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2 mx-auto"
-              style={{ background: "#6C63FF" }}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
             >
-              <RefreshCw size={16} />
-              Réessayer
+              <RefreshCw size={15} /> Reessayer
             </button>
-          </motion.div>
+          </section>
         ) : videos.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20"
-          >
-            <p className="text-4xl mb-4">🤔</p>
-            <p className="text-lg font-semibold text-white mb-2">
-              Rien trouvé pour ce mood
-            </p>
-            <p className="text-sm mb-6" style={{ color: "#6B7280" }}>
-              L'IA n'a pas trouvé de vidéos adaptées. Essaie le Mode Surprise ?
-            </p>
+          <section className="rounded-[22px] border border-[rgba(43,33,28,0.18)] bg-[rgba(255,251,245,0.76)] p-10 text-center">
+            <p className="font-serif text-3xl text-[var(--charcoal)]">Rien en cuisine pour ce mood</p>
+            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">Lance carte blanche pour trouver une piste inattendue.</p>
             <button
               onClick={handleSurprise}
-              className="px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2 mx-auto"
-              style={{ background: "#FF6584" }}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white"
             >
-              <Shuffle size={16} />
-              Mode Surprise
+              <Shuffle size={15} /> Carte blanche
             </button>
-          </motion.div>
+          </section>
         ) : (
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-          >
+          <motion.section layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {videos.map((video) => (
                 <VideoCard
@@ -839,20 +505,13 @@ export default function ResultsClient() {
                 />
               ))}
             </AnimatePresence>
-          </motion.div>
+          </motion.section>
         )}
 
-        {/* Footer */}
         {!loading && videos.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-center mt-10 text-xs"
-            style={{ color: "#4B5563" }}
-          >
-            Swipe ← ou clique ✕ pour passer · Clique ⊘ pour blacklister une chaîne
-          </motion.div>
+          <p className="mt-8 text-center text-xs uppercase tracking-[0.16em] text-[rgba(29,23,19,0.58)]">
+            Swipe gauche ou bouton X pour passer - bouton interdit pour blacklister
+          </p>
         )}
       </div>
     </main>

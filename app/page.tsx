@@ -1,50 +1,112 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Utensils, ChevronRight, Shuffle, Zap, Clock, Target } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Shuffle,
+  Sparkles,
+  UtensilsCrossed,
+} from "lucide-react";
 
 const DURATIONS = [
-  { label: "15 min", value: 15, icon: "⚡", desc: "Pause rapide" },
-  { label: "30 min", value: 30, icon: "🍽️", desc: "Repas classique" },
-  { label: "1h+", value: 65, icon: "🛋️", desc: "Je prends mon temps" },
+  { label: "15 min", value: 15, note: "Pause express", icon: "⚡" },
+  { label: "30 min", value: 30, note: "Service classique", icon: "🍽️" },
+  { label: "1h+", value: 65, note: "Je m'installe", icon: "🥂" },
 ];
 
 const MOODS = [
-  { label: "Drôle", value: "funny comedy entertainment humor", icon: "😂" },
+  { label: "Drole", value: "funny comedy entertainment humor", icon: "😂" },
   { label: "Chill", value: "relaxing calm lofi ambient chill", icon: "😌" },
   { label: "Info", value: "educational documentary explained knowledge", icon: "🧠" },
   { label: "Gaming", value: "gaming gameplay let's play commentary", icon: "🎮" },
   { label: "Cuisine", value: "food cooking recipe street food", icon: "🍜" },
-  { label: "Cinéma", value: "cinema movie review film analysis", icon: "🎬" },
-  { label: "Découverte", value: "travel nature exploration discovery world", icon: "🌍" },
+  { label: "Cinema", value: "cinema movie review film analysis", icon: "🎬" },
+  { label: "Decouverte", value: "travel nature exploration discovery world", icon: "🌍" },
   { label: "Musique", value: "music live concert performance artist", icon: "🎵" },
   { label: "Science", value: "science technology innovation space physics", icon: "🔬" },
-  { label: "J'sais pas", value: "interesting popular trending viral quality", icon: "🤷" },
+  { label: "Surprends-moi", value: "interesting popular trending viral quality", icon: "🎲" },
 ];
 
 const LANGUAGES = [
-  { label: "Français", value: "fr", flag: "🇫🇷" },
+  { label: "Francais", value: "fr", flag: "🇫🇷" },
   { label: "English", value: "en", flag: "🇬🇧" },
-  { label: "Peu importe", value: "any", flag: "🌐" },
+  { label: "Libre", value: "any", flag: "🌐" },
 ];
 
 type Step = "welcome" | "duration" | "mood" | "language";
 
 const pageVariants: Variants = {
-  enter: { opacity: 0, x: 40 },
-  center: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } },
-  exit: { opacity: 0, x: -40, transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } },
+  initial: { opacity: 0, y: 24 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: {
+    opacity: 0,
+    y: -24,
+    transition: { duration: 0.25, ease: [0.4, 0, 1, 1] },
+  },
 };
+
+function SplitTitle({ text }: { text: string }) {
+  return (
+    <h1 className="font-serif text-[clamp(2.3rem,6vw,4.5rem)] leading-[0.95] tracking-tight text-[var(--charcoal)]">
+      {text.split(" ").map((word, index) => (
+        <motion.span
+          key={`${word}-${index}`}
+          initial={{ opacity: 0, y: 26, rotateX: 25 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ delay: index * 0.08, duration: 0.5 }}
+          className="inline-block mr-3"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </h1>
+  );
+}
+
+function StepRail({ current }: { current: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      {[1, 2, 3].map((n) => (
+        <motion.div
+          key={n}
+          animate={{
+            width: n === current ? 48 : 18,
+            backgroundColor: n <= current ? "var(--wine)" : "rgba(43,33,28,0.2)",
+          }}
+          transition={{ duration: 0.3 }}
+          className="h-1.5 rounded-full"
+        />
+      ))}
+      <span className="text-xs font-semibold tracking-[0.2em] text-[var(--wine)] ml-1">
+        0{current}
+      </span>
+    </div>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [step, setStep] = useState<Step>("welcome");
   const [duration, setDuration] = useState<number | null>(null);
   const [mood, setMood] = useState<string | null>(null);
   const [customMood, setCustomMood] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [showCurtain, setShowCurtain] = useState(false);
+
+  const transitionTo = (next: Step) => {
+    setShowCurtain(true);
+    window.setTimeout(() => setStep(next), 170);
+    window.setTimeout(() => setShowCurtain(false), 520);
+  };
 
   const navigate = (lang: string, surprise = false) => {
     const finalMood = customMood.trim() || mood || "interesting popular trending";
@@ -68,447 +130,290 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#1A1A2E] flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Ambient blobs */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "-15%",
-          left: "-10%",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "#6C63FF",
-          opacity: 0.07,
-          filter: "blur(120px)",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: "-20%",
-          right: "-10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background: "#FF6584",
-          opacity: 0.07,
-          filter: "blur(100px)",
-        }}
-      />
+    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
+      <AnimatePresence>
+        {showCurtain && (
+          <motion.div
+            className="curtain-wipe"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: [0, 1, 0], transformOrigin: ["left", "left", "right"] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, times: [0, 0.5, 1], ease: "easeInOut" }}
+          />
+        )}
+      </AnimatePresence>
 
-      <div className="relative w-full max-w-2xl">
-        <AnimatePresence mode="wait">
-          {/* ─── WELCOME ─── */}
-          {step === "welcome" && (
-            <motion.div
-              key="welcome"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="text-center"
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center">
+              <UtensilsCrossed size={18} />
+            </div>
+            <div>
+              <p className="font-serif text-xl leading-none text-[var(--charcoal)]">LetMeEat</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[var(--wine)]">Bistro Match Lab</p>
+            </div>
+          </div>
+          {step !== "welcome" && (
+            <button
+              onClick={() => transitionTo("welcome")}
+              className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--charcoal)]"
             >
-              {/* Logo */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
-                className="flex items-center justify-center mb-8"
-              >
-                <div
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: 20,
-                    background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 0 40px rgba(108,99,255,0.4)",
-                  }}
-                >
-                  <Utensils size={28} color="white" />
-                </div>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="text-6xl md:text-7xl font-black mb-4 tracking-tight"
-              >
-                <span className="text-white">Let</span>
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Me
-                </span>
-                <span className="text-white">Eat</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl mb-2"
-                style={{ color: "#A0AEC0" }}
-              >
-                Tu manges. On s'occupe du reste.
-              </motion.p>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.25 }}
-                className="text-sm mb-10"
-                style={{ color: "#6B7280" }}
-              >
-                3 questions · 10 secondes · la vidéo parfaite pour ton repas
-              </motion.p>
-
-              {/* CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex flex-col sm:flex-row gap-3 justify-center mb-12"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.03, boxShadow: "0 0 40px rgba(108,99,255,0.5)" }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setStep("duration")}
-                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-white font-semibold text-lg"
-                  style={{
-                    background: "linear-gradient(135deg, #6C63FF, #7C73FF)",
-                    boxShadow: "0 0 25px rgba(108,99,255,0.3)",
-                  }}
-                >
-                  Trouve-moi quelque chose à regarder
-                  <ChevronRight size={20} />
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleSurprise}
-                  className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-semibold transition-colors"
-                  style={{
-                    border: "1px solid rgba(255,101,132,0.35)",
-                    color: "#FF6584",
-                    background: "rgba(255,101,132,0.05)",
-                  }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,101,132,0.12)")
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,101,132,0.05)")
-                  }
-                >
-                  <Shuffle size={18} />
-                  Mode Surprise
-                </motion.button>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center justify-center gap-8 text-sm"
-                style={{ color: "#6B7280" }}
-              >
-                <div className="flex items-center gap-2">
-                  <Clock size={14} />
-                  <span>&lt; 10 sec</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Target size={14} />
-                  <span>7 filtres</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap size={14} />
-                  <span>IA Groq</span>
-                </div>
-              </motion.div>
-            </motion.div>
+              Revenir au menu
+            </button>
           )}
+        </header>
 
-          {/* ─── DURATION ─── */}
-          {step === "duration" && (
-            <motion.div
-              key="duration"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              <StepDots current={1} />
-              <h2 className="text-3xl font-bold text-white text-center mb-2 mt-6">
-                T'as combien de temps ?
-              </h2>
-              <p className="text-center text-sm mb-8" style={{ color: "#8892A4" }}>
-                On adapte la durée des vidéos à ton repas
-              </p>
+        <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+          <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
+            <div className="absolute -top-7 -right-6 h-24 w-24 rounded-full border border-[rgba(86,19,30,0.22)]" />
+            <div className="absolute -bottom-7 -left-8 h-32 w-32 rounded-full border border-[rgba(86,19,30,0.18)]" />
 
-              <div className="grid grid-cols-3 gap-4">
-                {DURATIONS.map((d, i) => (
-                  <motion.button
-                    key={d.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.06 }}
-                    whileHover={{ scale: 1.04, y: -3 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => {
-                      setDuration(d.value);
-                      setTimeout(() => setStep("mood"), 120);
-                    }}
-                    className="flex flex-col items-center gap-3 p-6 rounded-2xl transition-all"
-                    style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      background: "rgba(255,255,255,0.04)",
-                    }}
-                    onMouseEnter={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.border = "1px solid rgba(108,99,255,0.5)";
-                      el.style.background = "rgba(108,99,255,0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.border = "1px solid rgba(255,255,255,0.08)";
-                      el.style.background = "rgba(255,255,255,0.04)";
-                    }}
-                  >
-                    <span className="text-4xl">{d.icon}</span>
-                    <span className="font-bold text-xl text-white">{d.label}</span>
-                    <span className="text-xs" style={{ color: "#8892A4" }}>
-                      {d.desc}
-                    </span>
-                  </motion.button>
-                ))}
-              </div>
+            <AnimatePresence mode="wait">
+              {step === "welcome" && (
+                <motion.div
+                  key="welcome"
+                  variants={pageVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
+                    Edition du soir
+                  </p>
+                  <SplitTitle text="Le bon plat. La bonne video." />
 
-              <button
-                onClick={() => setStep("welcome")}
-                className="flex items-center gap-1 mx-auto mt-6 text-sm transition-colors"
-                style={{ color: "#6B7280" }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#A0AEC0")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#6B7280")
-                }
-              >
-                ← Retour
-              </button>
-            </motion.div>
-          )}
+                  <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
+                    Tu lances le repas, on te sert des recommandations YouTube qui tombent pile dans
+                    ton timing. Sans scroll infini, sans hesitation.
+                  </p>
 
-          {/* ─── MOOD ─── */}
-          {step === "mood" && (
-            <motion.div
-              key="mood"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              <StepDots current={2} />
-              <h2 className="text-3xl font-bold text-white text-center mb-2 mt-6">
-                C'est quoi l'ambiance ?
-              </h2>
-              <p className="text-center text-sm mb-7" style={{ color: "#8892A4" }}>
-                Clique ou écris ce qui te passe par la tête
-              </p>
-
-              <div className="grid grid-cols-5 gap-2 mb-5">
-                {MOODS.map((m, i) => (
-                  <motion.button
-                    key={m.value}
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.04 }}
-                    whileHover={{ scale: 1.08, y: -2 }}
-                    whileTap={{ scale: 0.94 }}
-                    onClick={() => {
-                      setMood(m.value);
-                      setCustomMood("");
-                      setTimeout(() => setStep("language"), 120);
-                    }}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all"
-                    style={{
-                      border:
-                        mood === m.value && !customMood
-                          ? "1px solid rgba(108,99,255,0.7)"
-                          : "1px solid rgba(255,255,255,0.07)",
-                      background:
-                        mood === m.value && !customMood
-                          ? "rgba(108,99,255,0.15)"
-                          : "rgba(255,255,255,0.03)",
-                    }}
-                  >
-                    <span className="text-xl">{m.icon}</span>
-                    <span className="text-xs font-medium text-white">{m.label}</span>
-                  </motion.button>
-                ))}
-              </div>
-
-              {/* Free text */}
-              <div className="relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={customMood}
-                  onChange={(e) => {
-                    setCustomMood(e.target.value);
-                    if (e.target.value) setMood(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && customMood.trim()) {
-                      setStep("language");
-                    }
-                  }}
-                  placeholder="Ou tape ton mood... (ex: 'j'ai la flemme de réfléchir')"
-                  className="w-full rounded-2xl px-5 py-4 text-sm text-white outline-none transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: customMood
-                      ? "1px solid rgba(108,99,255,0.5)"
-                      : "1px solid rgba(255,255,255,0.08)",
-                    color: "white",
-                  }}
-                />
-                <AnimatePresence>
-                  {customMood && (
+                  <div className="mt-8 flex flex-col sm:flex-row gap-3">
                     <motion.button
-                      initial={{ opacity: 0, scale: 0.7 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.7 }}
-                      onClick={() => setStep("language")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl text-white text-sm font-semibold"
-                      style={{ background: "#6C63FF" }}
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => transitionTo("duration")}
+                      className="rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2"
                     >
-                      OK →
+                      Composer mon service
+                      <ChevronRight size={18} />
                     </motion.button>
-                  )}
-                </AnimatePresence>
-              </div>
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleSurprise}
+                      className="rounded-2xl border border-[rgba(86,19,30,0.35)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--wine)] flex items-center justify-center gap-2"
+                    >
+                      <Shuffle size={16} />
+                      Carte blanche
+                    </motion.button>
+                  </div>
 
-              <button
-                onClick={() => setStep("duration")}
-                className="flex items-center gap-1 mx-auto mt-5 text-sm transition-colors"
-                style={{ color: "#6B7280" }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#A0AEC0")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#6B7280")
-                }
-              >
-                ← Retour
-              </button>
-            </motion.div>
-          )}
+                  <div className="mt-8 flex flex-wrap items-center gap-4 text-xs text-[rgba(43,33,28,0.7)]">
+                    <span className="bistro-pill rounded-full px-3 py-1">3 questions</span>
+                    <span className="bistro-pill rounded-full px-3 py-1">10 secondes</span>
+                    <span className="bistro-pill rounded-full px-3 py-1">matching IA</span>
+                  </div>
+                </motion.div>
+              )}
 
-          {/* ─── LANGUAGE ─── */}
-          {step === "language" && (
-            <motion.div
-              key="language"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              <StepDots current={3} />
-              <h2 className="text-3xl font-bold text-white text-center mb-2 mt-6">
-                Dans quelle langue ?
-              </h2>
-              <p className="text-center text-sm mb-8" style={{ color: "#8892A4" }}>
-                Pour filtrer les vidéos recommandées
-              </p>
+              {step === "duration" && (
+                <motion.div key="duration" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                  <StepRail current={1} />
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] mt-5 text-[var(--charcoal)]">
+                    Combien de temps dure ton repas ?
+                  </h2>
+                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">
+                    On calibre les videos pour terminer juste avec ton assiette.
+                  </p>
 
-              <div className="grid grid-cols-3 gap-4">
-                {LANGUAGES.map((l, i) => (
-                  <motion.button
-                    key={l.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.07 }}
-                    whileHover={{
-                      scale: 1.05,
-                      y: -4,
-                      boxShadow: "0 0 30px rgba(108,99,255,0.25)",
-                    }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => navigate(l.value)}
-                    className="flex flex-col items-center gap-3 p-7 rounded-2xl transition-all"
-                    style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      background: "rgba(255,255,255,0.04)",
-                    }}
-                    onMouseEnter={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.border = "1px solid rgba(108,99,255,0.5)";
-                      el.style.background = "rgba(108,99,255,0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      const el = e.currentTarget as HTMLElement;
-                      el.style.border = "1px solid rgba(255,255,255,0.08)";
-                      el.style.background = "rgba(255,255,255,0.04)";
-                    }}
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {DURATIONS.map((d, index) => (
+                      <motion.button
+                        key={d.value}
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.06 }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setDuration(d.value);
+                          transitionTo("mood");
+                        }}
+                        className="rounded-2xl border border-[rgba(43,33,28,0.14)] bg-[rgba(255,255,255,0.62)] p-4 text-left"
+                      >
+                        <p className="text-2xl">{d.icon}</p>
+                        <p className="mt-3 font-serif text-2xl text-[var(--charcoal)]">{d.label}</p>
+                        <p className="text-sm text-[rgba(29,23,19,0.65)]">{d.note}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => transitionTo("welcome")}
+                    className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
                   >
-                    <span className="text-5xl">{l.flag}</span>
-                    <span className="font-bold text-white text-base">{l.label}</span>
-                  </motion.button>
-                ))}
-              </div>
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
 
-              <button
-                onClick={() => setStep("mood")}
-                className="flex items-center gap-1 mx-auto mt-6 text-sm transition-colors"
-                style={{ color: "#6B7280" }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#A0AEC0")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.color = "#6B7280")
-                }
-              >
-                ← Retour
-              </button>
+              {step === "mood" && (
+                <motion.div key="mood" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                  <StepRail current={2} />
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] mt-5 text-[var(--charcoal)]">
+                    Quelle ambiance aujourd'hui ?
+                  </h2>
+                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">
+                    Selectionne un mood ou ecris le tien, on s'occupe du service.
+                  </p>
+
+                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                    {MOODS.map((m, index) => (
+                      <motion.button
+                        key={m.value}
+                        initial={{ opacity: 0, scale: 0.93 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.03 }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => {
+                          setMood(m.value);
+                          setCustomMood("");
+                          transitionTo("language");
+                        }}
+                        className="rounded-xl px-3 py-3 text-center border text-sm"
+                        style={{
+                          borderColor:
+                            mood === m.value && !customMood
+                              ? "rgba(86,19,30,0.45)"
+                              : "rgba(43,33,28,0.18)",
+                          background:
+                            mood === m.value && !customMood
+                              ? "rgba(110,30,42,0.1)"
+                              : "rgba(255,255,255,0.5)",
+                        }}
+                      >
+                        <span className="block text-xl">{m.icon}</span>
+                        <span className="mt-1 block text-[13px] font-semibold text-[var(--charcoal)]">
+                          {m.label}
+                        </span>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 relative">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={customMood}
+                      onChange={(e) => {
+                        setCustomMood(e.target.value);
+                        if (e.target.value) setMood(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && customMood.trim()) transitionTo("language");
+                      }}
+                      placeholder="Ex: un truc captivant, pas trop bruyant"
+                      className="w-full rounded-2xl bg-[rgba(255,255,255,0.62)] border border-[rgba(43,33,28,0.2)] px-4 py-3.5 text-sm outline-none focus:border-[rgba(86,19,30,0.45)]"
+                    />
+                    {customMood && (
+                      <button
+                        onClick={() => transitionTo("language")}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white"
+                      >
+                        Valider
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => transitionTo("duration")}
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
+                  >
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
+
+              {step === "language" && (
+                <motion.div key="language" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                  <StepRail current={3} />
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] mt-5 text-[var(--charcoal)]">
+                    Dans quelle langue on sert ?
+                  </h2>
+                  <p className="mt-2 text-[rgba(29,23,19,0.7)]">On filtre directement les recommandations.</p>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {LANGUAGES.map((lang, index) => (
+                      <motion.button
+                        key={lang.value}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.06 }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => navigate(lang.value)}
+                        className="rounded-2xl border border-[rgba(43,33,28,0.18)] bg-[rgba(255,255,255,0.6)] p-5 text-center"
+                      >
+                        <p className="text-4xl">{lang.flag}</p>
+                        <p className="mt-3 font-serif text-2xl text-[var(--charcoal)]">{lang.label}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => transitionTo("mood")}
+                    className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
+                  >
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+
+          <aside className="flex flex-col gap-5">
+            <motion.div
+              initial={{ opacity: 0, x: 18 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bistro-card rounded-[28px] p-6"
+            >
+              <p className="text-xs uppercase tracking-[0.24em] text-[var(--wine)] font-semibold">Le service</p>
+              <ul className="mt-4 space-y-4">
+                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                  <Clock3 size={16} className="mt-0.5 text-[var(--wine)]" />
+                  Duree alignee sur ton repas, pas de video qui deborde.
+                </li>
+                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                  <Sparkles size={16} className="mt-0.5 text-[var(--wine)]" />
+                  Selection contextuelle selon ton humeur du moment.
+                </li>
+                <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
+                  <Shuffle size={16} className="mt-0.5 text-[var(--wine)]" />
+                  Mode carte blanche pour sortir de ta zone habituelle.
+                </li>
+              </ul>
             </motion.div>
-          )}
-        </AnimatePresence>
+
+            <motion.div
+              initial={{ opacity: 0, x: 18 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-[28px] bg-[var(--charcoal)] text-[#f4ecdf] p-6"
+            >
+              <p className="text-xs uppercase tracking-[0.2em] text-[#cfab74] font-semibold">Signature maison</p>
+              <p className="mt-4 font-serif text-3xl leading-tight">"Tu manges, on choisit pour toi."</p>
+              <p className="mt-3 text-sm text-[#dbc9b1] leading-relaxed">
+                Une reco utile, rapide, et vraiment regardable pendant ton repas. Pas un
+                feed de plus, un vrai concierge.
+              </p>
+              <div className="mt-6 h-[1px] bg-[rgba(244,236,223,0.2)]" />
+              <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[#b5a086]">LetMeEat Atelier</p>
+            </motion.div>
+          </aside>
+        </div>
       </div>
     </main>
-  );
-}
-
-function StepDots({ current }: { current: number }) {
-  return (
-    <div className="flex items-center justify-center gap-2">
-      {[1, 2, 3].map((n) => (
-        <motion.div
-          key={n}
-          animate={{
-            width: n === current ? 28 : 8,
-            background: n <= current ? "#6C63FF" : "rgba(255,255,255,0.15)",
-          }}
-          transition={{ duration: 0.3 }}
-          style={{ height: 4, borderRadius: 2 }}
-        />
-      ))}
-      <span className="text-xs ml-1" style={{ color: "#6B7280" }}>
-        {current}/3
-      </span>
-    </div>
   );
 }

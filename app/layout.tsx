@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmeeat.vercel.app";
 
@@ -14,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | LetMeEat",
   },
   description:
-    "Stop scrolling. Tell us your mood and how long you're eating — we find the perfect YouTube video in seconds. AI-powered, no account needed.",
+    "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds. AI-powered, no account needed.",
   keywords: [
     "what to watch while eating",
     "videos to watch while eating",
@@ -32,13 +42,13 @@ export const metadata: Metadata = {
     siteName: "LetMeEat",
     title: "Find the Perfect YouTube Video to Watch While Eating",
     description:
-      "Stop scrolling. Tell us your mood and how long you're eating — we find the perfect YouTube video in seconds.",
+      "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds.",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "LetMeEat — Find the perfect YouTube video for your meal",
+        alt: "LetMeEat - Find the perfect YouTube video for your meal",
       },
     ],
   },
@@ -63,10 +73,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
     languages: {
-      "en": SITE_URL,
-      "fr": `${SITE_URL}/lang/fr`,
-      "es": `${SITE_URL}/lang/es`,
-      "pt": `${SITE_URL}/lang/pt`,
+      en: SITE_URL,
+      fr: `${SITE_URL}/lang/fr`,
+      es: `${SITE_URL}/lang/es`,
+      pt: `${SITE_URL}/lang/pt`,
     },
   },
 };
@@ -80,7 +90,7 @@ const schemaOrg = {
       name: "LetMeEat",
       url: SITE_URL,
       description:
-        "AI-powered YouTube video recommendations for mealtime. Tell us your mood and meal duration — get the perfect video in seconds.",
+        "AI-powered YouTube video recommendations for mealtime. Tell us your mood and meal duration - get the perfect video in seconds.",
       applicationCategory: "EntertainmentApplication",
       operatingSystem: "Any",
       offers: {
@@ -104,7 +114,7 @@ const schemaOrg = {
           name: "What should I watch while eating?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "LetMeEat uses AI to find the perfect YouTube video for your meal. Just tell us your mood, how long you're eating, and your language preference — you get 3 perfectly matched videos in seconds.",
+            text: "LetMeEat uses AI to find the perfect YouTube video for your meal. Just tell us your mood, how long you're eating, and your language preference - you get 3 perfectly matched videos in seconds.",
           },
         },
         {
@@ -123,14 +133,6 @@ const schemaOrg = {
             text: "Yes, LetMeEat is completely free. No account, no subscription, no ads.",
           },
         },
-        {
-          "@type": "Question",
-          name: "What kind of videos can I find?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Funny, chill, educational, gaming, cooking, cinema, science, music — or surprise mode for unexpected discoveries. Videos are filtered by your exact meal duration so they always fit.",
-          },
-        },
       ],
     },
   ],
@@ -142,7 +144,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
       <head>
         <script
           type="application/ld+json"
