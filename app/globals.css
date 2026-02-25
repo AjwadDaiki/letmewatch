@@ -10,13 +10,13 @@
 }
 
 :root {
-  --paper: #f7efe1;
-  --paper-2: #efe2ce;
-  --ink: #1d1713;
-  --charcoal: #2b211c;
-  --wine: #6e1e2a;
-  --wine-strong: #56131e;
-  --brass: #b58543;
+  --paper: #f7f7f8;
+  --paper-2: #efeff1;
+  --ink: #0f0f10;
+  --charcoal: #19191b;
+  --wine: #ff0033;
+  --wine-strong: #d9042e;
+  --brass: #9b9ba1;
 }
 
 html {
@@ -29,8 +29,8 @@ body {
   color: var(--ink);
   font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, sans-serif;
   background:
-    radial-gradient(circle at 18% 12%, rgba(110, 30, 42, 0.13), transparent 40%),
-    radial-gradient(circle at 88% 88%, rgba(181, 133, 67, 0.14), transparent 42%),
+    radial-gradient(circle at 16% 14%, rgba(255, 0, 51, 0.11), transparent 36%),
+    radial-gradient(circle at 88% 86%, rgba(15, 15, 16, 0.08), transparent 44%),
     linear-gradient(180deg, var(--paper), var(--paper-2));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -45,25 +45,25 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.24;
+  opacity: 0.12;
   background-image:
-    radial-gradient(rgba(29, 23, 19, 0.1) 0.5px, transparent 0.5px),
-    radial-gradient(rgba(29, 23, 19, 0.08) 0.5px, transparent 0.5px);
+    radial-gradient(rgba(15, 15, 16, 0.08) 0.5px, transparent 0.5px),
+    radial-gradient(rgba(15, 15, 16, 0.06) 0.5px, transparent 0.5px);
   background-size: 3px 3px, 5px 5px;
   background-position: 0 0, 1px 1px;
   mix-blend-mode: multiply;
 }
 
 .bistro-card {
-  border: 1px solid rgba(43, 33, 28, 0.16);
-  background: rgba(255, 251, 245, 0.72);
-  box-shadow: 0 12px 30px rgba(43, 33, 28, 0.08);
-  backdrop-filter: blur(2px);
+  border: 1px solid rgba(15, 15, 16, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 10px 26px rgba(15, 15, 16, 0.08);
+  backdrop-filter: blur(4px);
 }
 
 .bistro-pill {
-  border: 1px solid rgba(43, 33, 28, 0.2);
-  background: rgba(255, 251, 245, 0.7);
+  border: 1px solid rgba(15, 15, 16, 0.14);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .curtain-wipe {
@@ -72,7 +72,7 @@ body {
   pointer-events: none;
   z-index: 80;
   transform-origin: left;
-  background: linear-gradient(90deg, var(--wine-strong), var(--wine), #8d2d3e);
+  background: linear-gradient(90deg, #b90227, var(--wine), #ff4d6d);
 }
 
 .gradient-ink {
@@ -106,16 +106,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #e5d6bf;
+  background: #e7e7ea;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b1836a;
+  background: #b7b7bf;
   border-radius: 999px;
 }
 
 ::selection {
-  background: rgba(110, 30, 42, 0.2);
+  background: rgba(255, 0, 51, 0.2);
 }
 
 .line-clamp-2 {

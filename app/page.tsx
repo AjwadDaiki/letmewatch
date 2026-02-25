@@ -10,8 +10,7 @@ import {
   Languages,
   MessageSquareText,
   Shuffle,
-  Sparkles,
-  UtensilsCrossed,
+  Youtube,
 } from "lucide-react";
 
 const DURATIONS = [
@@ -171,7 +170,7 @@ export default function Home() {
         <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center">
-              <UtensilsCrossed size={18} />
+              <Youtube size={18} />
             </div>
             <div>
               <p className="font-serif text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
@@ -472,12 +471,7 @@ export default function Home() {
                 "Dis ce que tu veux, on te propose mieux."
               </p>
               <p className="mt-3 text-sm text-[#dbc9b1] leading-relaxed">
-                Design clair, transitions propres, et recommandations utiles des la premiere
-                utilisation.
-              </p>
-              <div className="mt-6 h-[1px] bg-[rgba(244,236,223,0.2)]" />
-              <p className="mt-4 text-xs uppercase tracking-[0.14em] text-[#b5a086]">
-                Focus: comprehension immediate
+                Donne ton contexte en quelques mots et lance les recommandations immediatement.
               </p>
             </motion.div>
           </aside>
