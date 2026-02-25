@@ -357,7 +357,7 @@ export default function ResultsClient() {
 
   return (
     <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         <motion.header
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -516,7 +516,7 @@ export default function ResultsClient() {
             </button>
           </section>
         ) : (
-          <motion.section layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.section layout className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             <AnimatePresence mode="popLayout">
               {videos.map((video) => (
                 <VideoCard

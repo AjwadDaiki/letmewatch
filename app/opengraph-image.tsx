@@ -1,9 +1,62 @@
-﻿import { ImageResponse } from "next/og";
+import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "LetMeWatch - Find the perfect YouTube video for your meal";
+export const alt = "LetMeWatch - Smart video picks for your meal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+function BrandMark() {
+  return (
+    <div
+      style={{
+        width: 96,
+        height: 96,
+        borderRadius: 28,
+        background: "linear-gradient(145deg, #ff0033, #d9042e)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 14px 28px rgba(217,4,46,0.35)",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          width: 54,
+          height: 54,
+          borderRadius: 18,
+          border: "3px solid rgba(255,255,255,0.9)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderTop: "9px solid transparent",
+            borderBottom: "9px solid transparent",
+            borderLeft: "15px solid white",
+            marginLeft: 4,
+          }}
+        />
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 12,
+          top: 12,
+          width: 8,
+          height: 8,
+          borderRadius: 999,
+          background: "white",
+          opacity: 0.9,
+        }}
+      />
+    </div>
+  );
+}
 
 export default function OGImage() {
   return new ImageResponse(
@@ -13,117 +66,175 @@ export default function OGImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#1A1A2E",
-          position: "relative",
+          alignItems: "stretch",
+          justifyContent: "space-between",
+          background:
+            "radial-gradient(circle at 18% 12%, rgba(255,0,51,0.1), transparent 38%), radial-gradient(circle at 88% 88%, rgba(15,15,16,0.08), transparent 42%), linear-gradient(180deg, #eceef2, #dde1e8)",
           fontFamily: "system-ui, sans-serif",
+          color: "#19191b",
+          padding: "44px 48px",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         <div
           style={{
             position: "absolute",
-            top: -100,
-            left: -100,
-            width: 500,
-            height: 500,
-            borderRadius: "50%",
-            background: "rgba(108,99,255,0.18)",
-            filter: "blur(80px)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -80,
-            right: -80,
-            width: 400,
-            height: 400,
-            borderRadius: "50%",
-            background: "rgba(255,101,132,0.15)",
-            filter: "blur(60px)",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(90deg, rgba(15,15,16,0.035) 1px, transparent 1px), linear-gradient(180deg, rgba(15,15,16,0.03) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            opacity: 0.25,
           }}
         />
 
         <div
           style={{
+            width: "58%",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 90,
-            height: 90,
-            borderRadius: 24,
-            background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-            marginBottom: 28,
-            fontSize: 44,
+            flexDirection: "column",
+            justifyContent: "space-between",
+            position: "relative",
+            zIndex: 2,
           }}
         >
-          🍽️
-        </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+            <BrandMark />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 54, fontWeight: 900, letterSpacing: "-1.5px" }}>
+                LetMeWatch
+              </div>
+              <div
+                style={{
+                  fontSize: 18,
+                  color: "rgba(25,25,27,0.72)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  fontWeight: 700,
+                }}
+              >
+                Video picks that fit your meal
+              </div>
+            </div>
+          </div>
 
-        <div
-          style={{
-            display: "flex",
-            fontSize: 72,
-            fontWeight: 900,
-            letterSpacing: "-2px",
-            marginBottom: 16,
-          }}
-        >
-          <span style={{ color: "white" }}>Let</span>
-          <span
-            style={{
-              background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
-            Me
-          </span>
-          <span style={{ color: "white" }}>Watch</span>
-        </div>
-
-        <div
-          style={{
-            fontSize: 28,
-            color: "#A0AEC0",
-            textAlign: "center",
-            maxWidth: 700,
-            lineHeight: 1.4,
-            marginBottom: 40,
-          }}
-        >
-          Find the perfect YouTube video to watch while eating - in 10 seconds
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            gap: 24,
-          }}
-        >
-          {[
-            { icon: "⚡", text: "< 10 sec" },
-            { icon: "🎯", text: "AI-powered" },
-            { icon: "🆓", text: "100% free" },
-          ].map(({ icon, text }) => (
+          <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ fontSize: 46, fontWeight: 800, lineHeight: 1.08, letterSpacing: "-1px" }}>
+              Stop scrolling.
+              <br />
+              Start watching.
+            </div>
             <div
-              key={text}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "10px 20px",
-                borderRadius: 12,
-                background: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "#A0AEC0",
-                fontSize: 18,
+                fontSize: 24,
+                lineHeight: 1.4,
+                color: "rgba(25,25,27,0.72)",
+                maxWidth: 620,
               }}
             >
-              <span>{icon}</span>
-              <span>{text}</span>
+              Tell us your time, your vibe, your language. Get watchable YouTube
+              recommendations in seconds.
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+            {["3 quick steps", "< 10 sec", "No account"].map((item) => (
+              <div
+                key={item}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(15,15,16,0.14)",
+                  background: "rgba(255,255,255,0.85)",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: "rgba(25,25,27,0.78)",
+                }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "36%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+            position: "relative",
+            zIndex: 2,
+            justifyContent: "center",
+          }}
+        >
+          {[1, 2, 3].map((index) => (
+            <div
+              key={index}
+              style={{
+                borderRadius: 20,
+                border: "1px solid rgba(15,15,16,0.14)",
+                background: "rgba(255,255,255,0.88)",
+                boxShadow: "0 10px 24px rgba(15,15,16,0.09)",
+                padding: 10,
+                transform: index === 2 ? "translateX(10px)" : index === 3 ? "translateX(24px)" : "none",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: 112,
+                  borderRadius: 14,
+                  background:
+                    index === 1
+                      ? "linear-gradient(135deg, #1f2937, #111827)"
+                      : index === 2
+                      ? "linear-gradient(135deg, #334155, #0f172a)"
+                      : "linear-gradient(135deg, #374151, #111827)",
+                  position: "relative",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 999,
+                    background: "rgba(255,255,255,0.92)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderTop: "7px solid transparent",
+                      borderBottom: "7px solid transparent",
+                      borderLeft: "11px solid #ff0033",
+                      marginLeft: 3,
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 8,
+                    bottom: 8,
+                    padding: "3px 7px",
+                    borderRadius: 7,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "white",
+                    background: "rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {index === 1 ? "14:12" : index === 2 ? "27:31" : "33:08"}
+                </div>
+              </div>
             </div>
           ))}
         </div>

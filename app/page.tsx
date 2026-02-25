@@ -139,6 +139,12 @@ export default function Home() {
     setStep(next);
   };
 
+  const ambiancePreview = customMood.trim()
+    ? customMood.trim()
+    : mood
+    ? mood.split(" ").slice(0, 2).join(" ")
+    : "A definir";
+
   const pushToResults = (lang: string, surprise = false) => {
     const finalMood = customMood.trim() || mood || "interesting popular trending";
     const params = new URLSearchParams({
@@ -168,7 +174,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div
@@ -192,11 +198,22 @@ export default function Home() {
           )}
         </header>
 
-        <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+        <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
           <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
             {step !== "welcome" && (
-              <div className="mb-6">
+              <div className="mb-6 space-y-3">
                 <StepProgress current={step} />
+                <div className="rounded-2xl border border-[rgba(15,15,16,0.12)] bg-white/80 px-3 py-2 text-xs text-[rgba(15,15,16,0.7)] flex flex-wrap gap-2">
+                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1">
+                    Temps: {duration ? `${duration} min` : "A definir"}
+                  </span>
+                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1 truncate max-w-[220px]">
+                    Ambiance: {ambiancePreview}
+                  </span>
+                  <span className="rounded-full bg-[rgba(15,15,16,0.06)] px-2.5 py-1">
+                    Langue: {step === "language" ? "Choix en cours" : "A definir"}
+                  </span>
+                </div>
               </div>
             )}
 
@@ -252,6 +269,22 @@ export default function Home() {
                         </span>
                       )
                     )}
+                  </div>
+
+                  <div className="mt-5 grid gap-2 sm:grid-cols-3">
+                    {[
+                      { title: "Duree calibree", note: "Tu regardes sans couper en plein milieu." },
+                      { title: "Reco utile", note: "Des propositions lisibles des la premiere carte." },
+                      { title: "Flow rapide", note: "Tu reponds et tu lances en quelques secondes." },
+                    ].map((item) => (
+                      <div
+                        key={item.title}
+                        className="rounded-xl border border-[rgba(15,15,16,0.12)] bg-white/80 px-3 py-3"
+                      >
+                        <p className="text-sm font-semibold text-[var(--charcoal)]">{item.title}</p>
+                        <p className="mt-1 text-xs text-[rgba(15,15,16,0.66)] leading-relaxed">{item.note}</p>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               )}
@@ -448,7 +481,7 @@ export default function Home() {
             </AnimatePresence>
           </section>
 
-          <aside className="flex flex-col gap-5">
+          <aside className="flex flex-col gap-5 xl:sticky xl:top-6 h-fit">
             <motion.div
               initial={{ opacity: 0, x: 18 }}
               animate={{ opacity: 1, x: 0 }}
@@ -488,6 +521,31 @@ export default function Home() {
               <p className="mt-3 text-sm text-[rgba(15,15,16,0.68)] leading-relaxed">
                 Tu viens manger, pas chercher pendant 10 minutes.
               </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 18 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.16 }}
+              className="rounded-[20px] border border-[rgba(15,15,16,0.12)] bg-white/88 p-4"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(15,15,16,0.58)]">
+                Exemples rapides
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {[
+                  "video calme, peu de dialogue, 20 min",
+                  "quelque chose de drole mais pas bruyant",
+                  "mini documentaire ultra captivant",
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-[rgba(15,15,16,0.12)] bg-[rgba(15,15,16,0.03)] px-3 py-1 text-xs text-[rgba(15,15,16,0.68)]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             </motion.div>
           </aside>
         </div>

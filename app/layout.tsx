@@ -48,7 +48,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "LetMeWatch - Find the perfect YouTube video for your meal",
+        alt: "LetMeWatch - Smart video picks for your meal",
       },
     ],
   },
