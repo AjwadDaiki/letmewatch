@@ -39,7 +39,6 @@ const LANGUAGES = [
 ];
 
 type Step = "welcome" | "duration" | "mood" | "language";
-
 const STEP_ORDER: Step[] = ["welcome", "duration", "mood", "language"];
 
 const pageVariants: Variants = {
@@ -68,7 +67,7 @@ const pageVariants: Variants = {
 function SplitTitle({ text }: { text: string }) {
   const words = text.split(" ");
   return (
-    <h1 className="font-serif font-semibold text-[clamp(2rem,5.8vw,4rem)] leading-[0.96] tracking-tight text-[var(--charcoal)]">
+    <h1 className="font-serif font-semibold text-[clamp(2.1rem,5.6vw,4rem)] leading-[0.97] tracking-tight text-[var(--charcoal)]">
       {words.map((word, index) => (
         <motion.span
           key={`${word}-${index}`}
@@ -104,12 +103,12 @@ function StepProgress({ current }: { current: Step }) {
               className="h-1.5 rounded-full"
               animate={{
                 width: index === currentIndex ? 44 : 18,
-                backgroundColor: active ? "var(--wine)" : "rgba(194,213,255,0.24)",
+                backgroundColor: active ? "var(--wine)" : "rgba(21,32,51,0.2)",
               }}
             />
             <span
               className="text-[10px] uppercase tracking-[0.16em]"
-              style={{ color: active ? "var(--wine)" : "rgba(214,228,255,0.62)" }}
+              style={{ color: active ? "var(--wine)" : "rgba(21,32,51,0.55)" }}
             >
               {item.label}
             </span>
@@ -132,18 +131,11 @@ export default function Home() {
   const [navigating, setNavigating] = useState(false);
 
   const stepIndex = useMemo(() => STEP_ORDER.indexOf(step), [step]);
-
   const toStep = (next: Step) => {
     const nextIndex = STEP_ORDER.indexOf(next);
     setDirection(nextIndex >= stepIndex ? 1 : -1);
     setStep(next);
   };
-
-  const ambiancePreview = customMood.trim()
-    ? customMood.trim()
-    : mood
-    ? mood.split(" ").slice(0, 2).join(" ")
-    : "A definir";
 
   const pushToResults = (lang: string, surprise = false) => {
     const finalMood = customMood.trim() || mood || "interesting popular trending";
@@ -155,9 +147,7 @@ export default function Home() {
     });
 
     setNavigating(true);
-    window.setTimeout(() => {
-      router.push(`/results?${params.toString()}`);
-    }, 280);
+    window.setTimeout(() => router.push(`/results?${params.toString()}`), 280);
   };
 
   return (
@@ -175,12 +165,12 @@ export default function Home() {
       </AnimatePresence>
 
       <div className="mx-auto max-w-7xl">
-        <header className="mb-7 md:mb-9 flex items-center justify-between">
+        <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div
-              whileHover={{ scale: 1.06, rotate: -4 }}
-              transition={{ type: "spring", stiffness: 360, damping: 20 }}
-              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-[#051111] grid place-content-center shadow-[0_8px_18px_rgba(61,217,199,0.28)]"
+              whileHover={{ scale: 1.06, rotate: -3 }}
+              transition={{ type: "spring", stiffness: 340, damping: 22 }}
+              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center shadow-[0_10px_20px_rgba(255,47,79,0.25)]"
             >
               <Youtube size={18} />
             </motion.div>
@@ -196,50 +186,8 @@ export default function Home() {
           )}
         </header>
 
-        <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-          <aside className="order-2 xl:order-1 flex flex-col gap-5 xl:sticky xl:top-6 h-fit">
-            <motion.div
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bistro-card rounded-[26px] p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Mode d'emploi</p>
-              <div className="mt-4 space-y-3">
-                {[
-                  { icon: Clock3, text: "Choisis ton temps" },
-                  { icon: MessageSquareText, text: "Decris ton envie" },
-                  { icon: Languages, text: "Choisis ta langue" },
-                ].map((item) => (
-                  <div
-                    key={item.text}
-                    className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-3 flex items-center gap-3"
-                  >
-                    <item.icon size={16} className="text-[var(--wine)]" />
-                    <span className="text-sm text-[rgba(224,236,255,0.8)]">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.08 }}
-              className="bistro-card rounded-[26px] p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Contexte actuel</p>
-              <div className="mt-4 space-y-2 text-sm">
-                <div className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-2 text-[rgba(224,236,255,0.82)]">
-                  Temps: {duration ? `${duration} min` : "A definir"}
-                </div>
-                <div className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-2 text-[rgba(224,236,255,0.82)] truncate">
-                  Envie: {ambiancePreview}
-                </div>
-              </div>
-            </motion.div>
-          </aside>
-
-          <section className="order-1 xl:order-2 bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
+        <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+          <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
             {step !== "welcome" && (
               <div className="mb-6">
                 <StepProgress current={step} />
@@ -250,27 +198,28 @@ export default function Home() {
               {step === "welcome" && (
                 <motion.div key="welcome" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    Compris en 10 secondes
+                    Rapide et efficace
                   </p>
-                  <SplitTitle text="T'en as marre de scroller ?" />
-                  <p className="mt-6 max-w-xl text-[15px] md:text-base text-[rgba(224,236,255,0.8)] leading-relaxed">
-                    Dis-nous en trois points ce que tu veux et on te propose des videos que tu peux lancer tout de suite.
+                  <SplitTitle text="Marre de scroller avant chaque repas ?" />
+                  <p className="mt-6 max-w-xl text-[15px] md:text-base text-[rgba(21,32,51,0.76)] leading-relaxed">
+                    Reponds a 3 questions et lance directement une video adaptee a ton timing.
                   </p>
+
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
                     <motion.button
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => toStep("duration")}
-                      className="yt-button rounded-2xl bg-[var(--wine)] text-[#041110] px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(61,217,199,0.24)]"
+                      className="yt-button rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(255,47,79,0.24)]"
                     >
-                      Lancer la recherche
+                      Commencer
                       <ChevronRight size={18} />
                     </motion.button>
                     <motion.button
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => pushToResults("any", true)}
-                      className="yt-button rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.74)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--ink)] flex items-center justify-center gap-2"
+                      className="yt-button rounded-2xl border border-[rgba(21,32,51,0.15)] bg-white px-6 py-4 font-semibold text-sm md:text-base text-[var(--ink)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
                       Surprise directe
@@ -281,11 +230,8 @@ export default function Home() {
 
               {step === "duration" && (
                 <motion.div key="duration" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
-                    Combien de temps tu as ?
-                  </h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">On aligne la duree des videos avec ton repas.</p>
-
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Combien de temps tu as ?</h2>
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">On aligne la duree des videos avec ton repas.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {DURATIONS.map((item, index) => (
                       <motion.button
@@ -299,15 +245,14 @@ export default function Home() {
                           setDuration(item.value);
                           toStep("mood");
                         }}
-                        className="yt-button rounded-2xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.72)] p-4 text-left hover:shadow-[0_12px_24px_rgba(0,0,0,0.24)]"
+                        className="yt-button rounded-2xl border border-[rgba(21,32,51,0.14)] bg-white p-4 text-left hover:shadow-[0_12px_24px_rgba(21,32,51,0.08)]"
                       >
                         <p className="text-2xl">{item.icon}</p>
                         <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
-                        <p className="text-sm text-[rgba(214,228,255,0.7)]">{item.note}</p>
+                        <p className="text-sm text-[rgba(21,32,51,0.62)]">{item.note}</p>
                       </motion.button>
                     ))}
                   </div>
-
                   <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
                     <ChevronLeft size={14} /> Retour
                   </button>
@@ -316,16 +261,12 @@ export default function Home() {
 
               {step === "mood" && (
                 <motion.div key="mood" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
-                    Decris ce que t'as envie de regarder
-                  </h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">Quelques mots suffisent pour guider les recos.</p>
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Decris ce que t'as envie de regarder</h2>
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Un court texte suffit pour guider les recos.</p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
-                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink)]">
-                      Description libre
-                    </label>
-                    <p className="mt-1 text-sm text-[rgba(214,228,255,0.72)]">Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"</p>
+                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]">Description libre</label>
+                    <p className="mt-1 text-sm text-[rgba(21,32,51,0.62)]">Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"</p>
                     <div className="mt-3 relative">
                       <input
                         id="custom-mood"
@@ -347,14 +288,14 @@ export default function Home() {
                           if (customMood.trim()) toStep("language");
                         }}
                         disabled={!customMood.trim()}
-                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-[#041110] disabled:opacity-45 shadow-[0_8px_18px_rgba(61,217,199,0.22)]"
+                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45 shadow-[0_8px_18px_rgba(255,47,79,0.22)]"
                       >
                         Continuer
                       </button>
                     </div>
                   </div>
 
-                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(214,228,255,0.62)]">Ou choisis une idee rapide</p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(21,32,51,0.56)]">Ou choisis une idee rapide</p>
                   <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {MOODS.map((item, index) => (
                       <motion.button
@@ -369,10 +310,10 @@ export default function Home() {
                           setCustomMood("");
                           toStep("language");
                         }}
-                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
+                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(21,32,51,0.08)]"
                         style={{
-                          borderColor: mood === item.value && !customMood ? "rgba(61,217,199,0.62)" : "rgba(194,213,255,0.2)",
-                          background: mood === item.value && !customMood ? "rgba(61,217,199,0.14)" : "rgba(8,14,28,0.66)",
+                          borderColor: mood === item.value && !customMood ? "rgba(255,47,79,0.42)" : "rgba(21,32,51,0.14)",
+                          background: mood === item.value && !customMood ? "rgba(255,47,79,0.1)" : "rgba(255,255,255,0.8)",
                         }}
                       >
                         <span className="block text-xl">{item.icon}</span>
@@ -390,8 +331,7 @@ export default function Home() {
               {step === "language" && (
                 <motion.div key="language" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Quelle langue preferee ?</h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">Derniere etape, puis on te sort la selection.</p>
-
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Derniere etape, puis on lance la selection.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {LANGUAGES.map((item, index) => (
                       <motion.button
@@ -402,14 +342,13 @@ export default function Home() {
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => pushToResults(item.value)}
-                        className="yt-button rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.72)] p-5 text-center hover:shadow-[0_10px_22px_rgba(0,0,0,0.24)]"
+                        className="yt-button rounded-2xl border border-[rgba(21,32,51,0.15)] bg-white p-5 text-center hover:shadow-[0_10px_22px_rgba(21,32,51,0.08)]"
                       >
                         <p className="text-4xl">{item.flag}</p>
                         <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
                       </motion.button>
                     ))}
                   </div>
-
                   <button onClick={() => toStep("mood")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
                     <ChevronLeft size={14} /> Retour
                   </button>
@@ -417,6 +356,29 @@ export default function Home() {
               )}
             </AnimatePresence>
           </section>
+
+          <aside className="bistro-card rounded-[30px] p-6 md:p-7 h-fit">
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Comment ca marche</p>
+            <div className="mt-4 space-y-3">
+              {[
+                { icon: Clock3, title: "1. Choisis ton temps", text: "15 min, 30 min ou plus." },
+                { icon: MessageSquareText, title: "2. Decris ton envie", text: "Libre ou via un preset rapide." },
+                { icon: Languages, title: "3. Choisis la langue", text: "Puis on lance les recommandations." },
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4 flex gap-3">
+                  <item.icon size={16} className="text-[var(--wine)] mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--charcoal)]">{item.title}</p>
+                    <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">{item.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 rounded-2xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4">
+              <p className="text-sm font-semibold text-[var(--charcoal)]">Objectif</p>
+              <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">Trouver vite une video qui colle vraiment a ton repas.</p>
+            </div>
+          </aside>
         </div>
       </div>
     </main>
