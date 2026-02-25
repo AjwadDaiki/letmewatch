@@ -230,7 +230,7 @@ export default function Home() {
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
                     3 questions rapides
                   </p>
-                  <SplitTitle text="Tu manges. On trouve ta video." />
+                  <SplitTitle text="T'en as marre de scroller ?" />
 
                   <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
                     Tu dis juste ton temps, ton ambiance et ta langue. On te propose
@@ -271,21 +271,6 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="mt-5 grid gap-2 sm:grid-cols-3">
-                    {[
-                      { title: "Duree calibree", note: "Tu regardes sans couper en plein milieu." },
-                      { title: "Reco utile", note: "Des propositions lisibles des la premiere carte." },
-                      { title: "Flow rapide", note: "Tu reponds et tu lances en quelques secondes." },
-                    ].map((item) => (
-                      <div
-                        key={item.title}
-                        className="rounded-xl border border-[rgba(15,15,16,0.12)] bg-white/80 px-3 py-3"
-                      >
-                        <p className="text-sm font-semibold text-[var(--charcoal)]">{item.title}</p>
-                        <p className="mt-1 text-xs text-[rgba(15,15,16,0.66)] leading-relaxed">{item.note}</p>
-                      </div>
-                    ))}
-                  </div>
                 </motion.div>
               )}
 
@@ -523,30 +508,6 @@ export default function Home() {
               </p>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.16 }}
-              className="rounded-[20px] border border-[rgba(15,15,16,0.12)] bg-white/88 p-4"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(15,15,16,0.58)]">
-                Exemples rapides
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {[
-                  "video calme, peu de dialogue, 20 min",
-                  "quelque chose de drole mais pas bruyant",
-                  "mini documentaire ultra captivant",
-                ].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-[rgba(15,15,16,0.12)] bg-[rgba(15,15,16,0.03)] px-3 py-1 text-xs text-[rgba(15,15,16,0.68)]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
           </aside>
         </div>
       </div>
