@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
@@ -68,13 +68,13 @@ const pageVariants: Variants = {
 function SplitTitle({ text }: { text: string }) {
   const words = text.split(" ");
   return (
-    <h1 className="font-serif font-semibold text-[clamp(2.15rem,6vw,4.2rem)] leading-[0.95] tracking-tight text-[var(--charcoal)]">
+    <h1 className="font-serif font-semibold text-[clamp(2rem,5.8vw,4rem)] leading-[0.96] tracking-tight text-[var(--charcoal)]">
       {words.map((word, index) => (
         <motion.span
           key={`${word}-${index}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.06, duration: 0.38 }}
+          transition={{ delay: index * 0.05, duration: 0.34 }}
           className="inline-block"
         >
           {word}
@@ -88,13 +88,13 @@ function SplitTitle({ text }: { text: string }) {
 function StepProgress({ current }: { current: Step }) {
   const labels = [
     { step: "duration", label: "Temps" },
-    { step: "mood", label: "Ambiance" },
+    { step: "mood", label: "Envie" },
     { step: "language", label: "Langue" },
   ] as const;
 
   const currentIndex = Math.max(0, labels.findIndex((item) => item.step === current));
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 flex-wrap">
       {labels.map((item, index) => {
         const active = index <= currentIndex;
         return (
@@ -103,7 +103,7 @@ function StepProgress({ current }: { current: Step }) {
               layout
               className="h-1.5 rounded-full"
               animate={{
-                width: index === currentIndex ? 42 : 16,
+                width: index === currentIndex ? 44 : 18,
                 backgroundColor: active ? "var(--wine)" : "rgba(194,213,255,0.24)",
               }}
             />
@@ -175,7 +175,7 @@ export default function Home() {
       </AnimatePresence>
 
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex items-center justify-between">
+        <header className="mb-7 md:mb-9 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div
               whileHover={{ scale: 1.06, rotate: -4 }}
@@ -184,59 +184,78 @@ export default function Home() {
             >
               <Youtube size={18} />
             </motion.div>
-            <div>
-              <p className="font-serif font-semibold text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
-            </div>
+            <p className="font-serif font-semibold text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
           </div>
           {step !== "welcome" && (
             <button
               onClick={() => toStep("welcome")}
-              className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--charcoal)]"
+              className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
             >
-              Retour accueil
+              Recommencer
             </button>
           )}
         </header>
 
-        <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-          <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
-            {step !== "welcome" && (
-              <div className="mb-6 space-y-3">
-                <StepProgress current={step} />
-                <div className="rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.74)] px-3 py-2 text-xs text-[rgba(229,238,255,0.8)] flex flex-wrap gap-2">
-                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1">
-                    Temps: {duration ? `${duration} min` : "A definir"}
-                  </span>
-                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1 truncate max-w-[220px]">
-                    Ambiance: {ambiancePreview}
-                  </span>
-                  <span className="rounded-full bg-[rgba(194,213,255,0.12)] px-2.5 py-1">
-                    Langue: {step === "language" ? "Choix en cours" : "A definir"}
-                  </span>
+        <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+          <aside className="order-2 xl:order-1 flex flex-col gap-5 xl:sticky xl:top-6 h-fit">
+            <motion.div
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bistro-card rounded-[26px] p-6"
+            >
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Mode d'emploi</p>
+              <div className="mt-4 space-y-3">
+                {[
+                  { icon: Clock3, text: "Choisis ton temps" },
+                  { icon: MessageSquareText, text: "Decris ton envie" },
+                  { icon: Languages, text: "Choisis ta langue" },
+                ].map((item) => (
+                  <div
+                    key={item.text}
+                    className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-3 flex items-center gap-3"
+                  >
+                    <item.icon size={16} className="text-[var(--wine)]" />
+                    <span className="text-sm text-[rgba(224,236,255,0.8)]">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.08 }}
+              className="bistro-card rounded-[26px] p-6"
+            >
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Contexte actuel</p>
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-2 text-[rgba(224,236,255,0.82)]">
+                  Temps: {duration ? `${duration} min` : "A definir"}
                 </div>
+                <div className="rounded-xl border border-[rgba(194,213,255,0.16)] bg-[rgba(8,14,28,0.7)] px-3 py-2 text-[rgba(224,236,255,0.82)] truncate">
+                  Envie: {ambiancePreview}
+                </div>
+              </div>
+            </motion.div>
+          </aside>
+
+          <section className="order-1 xl:order-2 bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
+            {step !== "welcome" && (
+              <div className="mb-6">
+                <StepProgress current={step} />
               </div>
             )}
 
             <AnimatePresence custom={direction} mode="wait">
               {step === "welcome" && (
-                <motion.div
-                  key="welcome"
-                  custom={direction}
-                  variants={pageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                >
+                <motion.div key="welcome" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    3 questions rapides
+                    Compris en 10 secondes
                   </p>
                   <SplitTitle text="T'en as marre de scroller ?" />
-
-                  <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(224,236,255,0.8)] leading-relaxed">
-                    Tu donnes ton temps, ta langue, et ce que t'as envie de regarder.
-                    On te propose directement des videos qui matchent ton repas.
+                  <p className="mt-6 max-w-xl text-[15px] md:text-base text-[rgba(224,236,255,0.8)] leading-relaxed">
+                    Dis-nous en trois points ce que tu veux et on te propose des videos que tu peux lancer tout de suite.
                   </p>
-
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
                     <motion.button
                       whileHover={{ y: -2, scale: 1.01 }}
@@ -244,7 +263,7 @@ export default function Home() {
                       onClick={() => toStep("duration")}
                       className="yt-button rounded-2xl bg-[var(--wine)] text-[#041110] px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(61,217,199,0.24)]"
                     >
-                      C'est parti
+                      Lancer la recherche
                       <ChevronRight size={18} />
                     </motion.button>
                     <motion.button
@@ -254,41 +273,18 @@ export default function Home() {
                       className="yt-button rounded-2xl border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.74)] px-6 py-4 font-semibold text-sm md:text-base text-[var(--ink)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
-                      Mode surprise
+                      Surprise directe
                     </motion.button>
                   </div>
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {["Resultats en quelques secondes", "Duree adaptee", "Aucune inscription"].map(
-                      (item) => (
-                        <span
-                          key={item}
-                          className="rounded-full border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.68)] px-3 py-1 text-xs font-medium text-[rgba(224,236,255,0.8)]"
-                        >
-                          {item}
-                        </span>
-                      )
-                    )}
-                  </div>
-
                 </motion.div>
               )}
 
               {step === "duration" && (
-                <motion.div
-                  key="duration"
-                  custom={direction}
-                  variants={pageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                >
+                <motion.div key="duration" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Combien de temps tu as ?
                   </h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
-                    On filtre la duree pour que la video colle a ton repas.
-                  </p>
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">On aligne la duree des videos avec ton repas.</p>
 
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {DURATIONS.map((item, index) => (
@@ -312,41 +308,24 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <button
-                    onClick={() => toStep("welcome")}
-                    className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
-                  >
+                  <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
               )}
 
               {step === "mood" && (
-                <motion.div
-                  key="mood"
-                  custom={direction}
-                  variants={pageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                >
+                <motion.div key="mood" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
                     Decris ce que t'as envie de regarder
                   </h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
-                    Sois precis, vague, ou creatif: cette description guide tout.
-                  </p>
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">Quelques mots suffisent pour guider les recos.</p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
-                    <label
-                      htmlFor="custom-mood"
-                      className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink)]"
-                    >
+                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ink)]">
                       Description libre
                     </label>
-                    <p className="mt-1 text-sm text-[rgba(214,228,255,0.72)]">
-                      Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"
-                    </p>
+                    <p className="mt-1 text-sm text-[rgba(214,228,255,0.72)]">Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"</p>
                     <div className="mt-3 relative">
                       <input
                         id="custom-mood"
@@ -375,9 +354,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(214,228,255,0.62)]">
-                    Idees rapides
-                  </p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(214,228,255,0.62)]">Ou choisis une idee rapide</p>
                   <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {MOODS.map((item, index) => (
                       <motion.button
@@ -392,50 +369,28 @@ export default function Home() {
                           setCustomMood("");
                           toStep("language");
                         }}
-                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(15,15,16,0.08)]"
+                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
                         style={{
-                          borderColor:
-                            mood === item.value && !customMood
-                              ? "rgba(61,217,199,0.62)"
-                              : "rgba(194,213,255,0.2)",
-                          background:
-                            mood === item.value && !customMood
-                              ? "rgba(61,217,199,0.14)"
-                              : "rgba(8,14,28,0.66)",
+                          borderColor: mood === item.value && !customMood ? "rgba(61,217,199,0.62)" : "rgba(194,213,255,0.2)",
+                          background: mood === item.value && !customMood ? "rgba(61,217,199,0.14)" : "rgba(8,14,28,0.66)",
                         }}
                       >
                         <span className="block text-xl">{item.icon}</span>
-                        <span className="mt-1 block text-[13px] font-semibold text-[var(--charcoal)]">
-                          {item.label}
-                        </span>
+                        <span className="mt-1 block text-[13px] font-semibold text-[var(--charcoal)]">{item.label}</span>
                       </motion.button>
                     ))}
                   </div>
 
-                  <button
-                    onClick={() => toStep("duration")}
-                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
-                  >
+                  <button onClick={() => toStep("duration")} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
               )}
 
               {step === "language" && (
-                <motion.div
-                  key="language"
-                  custom={direction}
-                  variants={pageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                >
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
-                    Quelle langue preferee ?
-                  </h2>
-                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">
-                    Derniere etape: on lance les recommandations.
-                  </p>
+                <motion.div key="language" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
+                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Quelle langue preferee ?</h2>
+                  <p className="mt-2 text-[rgba(224,236,255,0.76)]">Derniere etape, puis on te sort la selection.</p>
 
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {LANGUAGES.map((item, index) => (
@@ -455,60 +410,13 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <button
-                    onClick={() => toStep("mood")}
-                    className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]"
-                  >
+                  <button onClick={() => toStep("mood")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </section>
-
-          <aside className="flex flex-col gap-5 xl:sticky xl:top-6 h-fit">
-            <motion.div
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bistro-card rounded-[28px] p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.24em] text-[var(--wine)] font-semibold">
-                Comment ca marche
-              </p>
-              <ul className="mt-4 space-y-4">
-                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
-                  <Clock3 size={16} className="mt-0.5 text-[var(--wine)]" />
-                  1. Tu choisis la duree de ton repas.
-                </li>
-                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
-                  <MessageSquareText size={16} className="mt-0.5 text-[var(--wine)]" />
-                  2. Tu decris ton envie du moment.
-                </li>
-                <li className="flex items-start gap-3 text-sm text-[rgba(224,236,255,0.78)]">
-                  <Languages size={16} className="mt-0.5 text-[var(--wine)]" />
-                  3. Tu choisis la langue et on te sort des recos.
-                </li>
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-[28px] border border-[rgba(194,213,255,0.18)] bg-[rgba(8,14,28,0.76)] text-[var(--ink)] p-6"
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-[rgba(214,228,255,0.62)] font-semibold">
-                LetMeWatch
-              </p>
-              <p className="mt-4 font-serif font-semibold text-3xl leading-tight">
-                Plus de scroll inutile.
-              </p>
-              <p className="mt-3 text-sm text-[rgba(214,228,255,0.72)] leading-relaxed">
-                Tu viens manger, pas chercher pendant 10 minutes.
-              </p>
-            </motion.div>
-
-          </aside>
         </div>
       </div>
     </main>
