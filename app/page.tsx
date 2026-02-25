@@ -331,7 +331,7 @@ export default function Home() {
                   exit="exit"
                 >
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">
-                    Decris ce qui te ferait plaisir
+                    Decris ce que t'as envie de regarder
                   </h2>
                   <p className="mt-2 text-[rgba(29,23,19,0.7)]">
                     Sois precis, vague, ou creatif: cette description guide tout.
