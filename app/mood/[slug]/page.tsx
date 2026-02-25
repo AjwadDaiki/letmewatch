@@ -210,14 +210,12 @@ export default async function MoodPage({
           <section style={{ marginBottom: 56 }}>
             <h2
               style={{
-                fontSize: 20,
+                fontSize: 12,
                 fontWeight: 700,
-                color: "white",
+                color: "#6C63FF",
                 marginBottom: 20,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                fontSize: 12,
-                color: "#6C63FF",
               }}
             >
               What to expect
