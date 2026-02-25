@@ -66,17 +66,19 @@ const pageVariants: Variants = {
 };
 
 function SplitTitle({ text }: { text: string }) {
+  const words = text.split(" ");
   return (
     <h1 className="font-serif font-semibold text-[clamp(2.15rem,6vw,4.2rem)] leading-[0.95] tracking-tight text-[var(--charcoal)]">
-      {text.split(" ").map((word, index) => (
+      {words.map((word, index) => (
         <motion.span
           key={`${word}-${index}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.06, duration: 0.38 }}
-          className="inline-block mr-3"
+          className="inline-block"
         >
           {word}
+          {index < words.length - 1 ? "\u00A0" : ""}
         </motion.span>
       ))}
     </h1>
@@ -212,13 +214,13 @@ export default function Home() {
                   exit="exit"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    3 etapes, 10 secondes
+                    3 questions rapides
                   </p>
-                  <SplitTitle text="Tu manges. On te trouve quoi regarder." />
+                  <SplitTitle text="Tu manges. On trouve ta video." />
 
                   <p className="mt-6 max-w-lg text-[15px] md:text-base text-[rgba(29,23,19,0.78)] leading-relaxed">
-                    Tu donnes un timing, un mood, une langue. Tu recois des videos YouTube
-                    directement regardables, sans perdre du temps.
+                    Tu dis juste ton temps, ton mood et ta langue. On te propose
+                    directement des videos qui se regardent bien pendant ton repas.
                   </p>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -228,7 +230,7 @@ export default function Home() {
                       onClick={() => toStep("duration")}
                       className="yt-button rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(255,0,51,0.28)]"
                     >
-                      Commencer
+                      C'est parti
                       <ChevronRight size={18} />
                     </motion.button>
                     <motion.button
@@ -238,7 +240,7 @@ export default function Home() {
                       className="yt-button rounded-2xl border border-[rgba(15,15,16,0.16)] bg-white/80 px-6 py-4 font-semibold text-sm md:text-base text-[var(--charcoal)] flex items-center justify-center gap-2"
                     >
                       <Shuffle size={16} />
-                      Surprise directe
+                      Mode surprise
                     </motion.button>
                   </div>
                 </motion.div>
@@ -448,15 +450,15 @@ export default function Home() {
               <ul className="mt-4 space-y-4">
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <Clock3 size={16} className="mt-0.5 text-[var(--wine)]" />
-                  1. Tu fixes ton temps.
+                  1. Tu choisis la duree de ton repas.
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <MessageSquareText size={16} className="mt-0.5 text-[var(--wine)]" />
-                  2. Tu decris ton mood (libre ou preset).
+                  2. Tu decris ce que tu veux regarder.
                 </li>
                 <li className="flex items-start gap-3 text-sm text-[rgba(29,23,19,0.75)]">
                   <Languages size={16} className="mt-0.5 text-[var(--wine)]" />
-                  3. Tu choisis la langue et c'est lance.
+                  3. Tu choisis la langue et on te sort des recos.
                 </li>
               </ul>
             </motion.div>
@@ -471,10 +473,10 @@ export default function Home() {
                 LetMeWatch
               </p>
               <p className="mt-4 font-serif font-semibold text-3xl leading-tight">
-                Rapide, clair, utile.
+                Plus de scroll inutile.
               </p>
               <p className="mt-3 text-sm text-[rgba(15,15,16,0.68)] leading-relaxed">
-                Donne ton contexte en quelques mots et lance les recommandations immediatement.
+                Tu viens manger, pas chercher pendant 10 minutes.
               </p>
             </motion.div>
           </aside>
