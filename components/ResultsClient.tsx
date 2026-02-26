@@ -74,7 +74,6 @@ function VideoCard({ video, onReject, onBlacklist, onPlay }: {
       transition={{ duration: 0.28 }}
       style={{ x, rotate, opacity, position: "relative" }}
       className="group"
-      css-override="true"
     >
       <div style={{
         background: "#1c1917",
@@ -359,13 +358,13 @@ export default function ResultsClient() {
   };
 
   /* ── Shared button style ── */
-  const btnBase: React.CSSProperties = {
+  const btnBase = {
     display: "inline-flex", alignItems: "center", gap: 6,
     padding: "7px 14px", borderRadius: "10px",
     background: "#1c1917", border: "1px solid rgba(255,255,255,0.09)",
     color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: 500,
     cursor: "pointer", transition: "all 0.18s ease",
-  };
+  } as const;
 
   return (
     <main style={{ minHeight: "100vh", padding: "20px 16px", fontFamily: "var(--font-outfit,'Inter',sans-serif)" }}>

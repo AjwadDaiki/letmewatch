@@ -1,375 +1,385 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  Clock,
-  ArrowRight,
-  Play,
   ChevronLeft,
-  Search,
-  Laugh,
-  Coffee,
-  BookOpen,
-  Gamepad2,
-  ChefHat,
-  Film,
-  Music,
-  Zap,
+  ChevronRight,
+  Clock3,
   Globe,
+  MessageSquareText,
+  Play,
   Shuffle,
+  Youtube,
 } from "lucide-react";
 
-/* ── Types ── */
-interface TimeOption {
-  value: number;
-  label: string;
-  description: string;
-  note: string;
-}
+type Step = "welcome" | "duration" | "context" | "language";
+type Language = "fr" | "en" | "any";
 
-interface Category {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  bg: string;
-  color: string;
-}
+const STEP_ORDER: Step[] = ["welcome", "duration", "context", "language"];
 
-type Step = "time" | "search";
-
-/* ── Data ── */
-const timeOptions: TimeOption[] = [
-  { value: 15, label: "15 min", description: "Pause éclair",   note: "2–3 vidéos courtes" },
-  { value: 30, label: "30 min", description: "Repas standard", note: "4–6 vidéos" },
-  { value: 65, label: "1h+",    description: "Long repas",     note: "8+ vidéos" },
+const DURATIONS = [
+  { label: "15 min", value: 15, note: "Rapide" },
+  { label: "30 min", value: 30, note: "Standard" },
+  { label: "1h+", value: 65, note: "Pose longue" },
 ];
 
-const categories: Category[] = [
-  { id: "funny",       label: "Drôle",     icon: <Laugh     className="w-4 h-4" />, bg: "rgba(234,179,8,0.12)",   color: "#eab308" },
-  { id: "chill",       label: "Détente",   icon: <Coffee    className="w-4 h-4" />, bg: "rgba(59,130,246,0.12)",  color: "#60a5fa" },
-  { id: "educational", label: "Éducatif",  icon: <BookOpen  className="w-4 h-4" />, bg: "rgba(34,197,94,0.12)",   color: "#4ade80" },
-  { id: "gaming",      label: "Gaming",    icon: <Gamepad2  className="w-4 h-4" />, bg: "rgba(168,85,247,0.12)",  color: "#c084fc" },
-  { id: "cooking",     label: "Cuisine",   icon: <ChefHat   className="w-4 h-4" />, bg: "rgba(249,115,22,0.12)",  color: "#fb923c" },
-  { id: "cinema",      label: "Cinéma",    icon: <Film      className="w-4 h-4" />, bg: "rgba(236,72,153,0.12)",  color: "#f472b6" },
-  { id: "music",       label: "Musique",   icon: <Music     className="w-4 h-4" />, bg: "rgba(6,182,212,0.12)",   color: "#22d3ee" },
-  { id: "science",     label: "Science",   icon: <Zap       className="w-4 h-4" />, bg: "rgba(16,185,129,0.12)",  color: "#34d399" },
-  { id: "travel",      label: "Voyage",    icon: <Globe     className="w-4 h-4" />, bg: "rgba(99,102,241,0.12)",  color: "#818cf8" },
-  { id: "surprise",    label: "Surprise",  icon: <Shuffle   className="w-4 h-4" />, bg: "rgba(239,68,68,0.12)",   color: "#f87171" },
+const CONTEXT_PRESETS = [
+  { label: "Drôle", value: "funny comedy entertainment humor" },
+  { label: "Détente", value: "relaxing calm lofi ambient chill" },
+  { label: "Docu", value: "documentary educational interesting" },
+  { label: "Gaming", value: "gaming gameplay commentary highlights" },
+  { label: "Cinéma", value: "movie review cinema analysis" },
+  { label: "Musique", value: "live session music performance" },
+  { label: "Science", value: "science technology innovation explained" },
+  { label: "Surprise", value: "interesting popular trending high quality" },
 ];
 
-/* ── Shared tokens ── */
-const S = {
-  card:    { background: "#1c1917", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "16px" } as const,
-  surface: "#26201d",
-  muted:   "rgba(255,255,255,0.46)",
-  red:     "#ef4444",
-  redGlow: "rgba(239,68,68,0.22)",
+const LANGUAGES: { label: string; value: Language; icon: string }[] = [
+  { label: "Français", value: "fr", icon: "🇫🇷" },
+  { label: "English", value: "en", icon: "🇬🇧" },
+  { label: "Peu importe", value: "any", icon: "🌐" },
+];
+
+const panelVariants: Variants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    y: 20,
+    x: direction > 0 ? 18 : -18,
+    filter: "blur(4px)",
+  }),
+  center: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    y: -14,
+    x: direction > 0 ? -16 : 16,
+    filter: "blur(3px)",
+    transition: { duration: 0.2, ease: [0.4, 0, 1, 1] },
+  }),
 };
 
-/* ──────────────────────────────────────── */
-export default function Home() {
-  const router   = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const [step,   setStep]   = useState<Step>("time");
-  const [time,   setTime]   = useState<number | null>(null);
-  const [text,   setText]   = useState("");
-  const [fading, setFading] = useState(false);
-
-  function goTo(next: Step) {
-    setFading(true);
-    setTimeout(() => { setStep(next); setFading(false); }, 340);
-  }
-
-  function handleTimeSelect(v: number) {
-    setTime(v);
-    goTo("search");
-    setTimeout(() => inputRef.current?.focus(), 420);
-  }
-
-  function launch(mood: string) {
-    router.push(`/results?mood=${encodeURIComponent(mood)}&duration=${time}&language=fr`);
-  }
-
-  function handleTextSubmit() {
-    const q = text.trim();
-    if (q) launch(q);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") handleTextSubmit();
-  }
-
-  /* ── Wrapper ── */
+function SplitTitle({ text }: { text: string }) {
+  const words = text.split(" ");
   return (
-    <main style={{
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "32px 16px",
-      fontFamily: "var(--font-outfit, 'Inter', sans-serif)",
-    }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebApplication", name: "LetMeWatch", url: "https://letmewatch.me", description: "AI-powered YouTube video recommender for meal times. Tell us your mood, get the perfect video in seconds.", applicationCategory: "EntertainmentApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [{ "@type": "Question", name: "What should I watch while eating?", acceptedAnswer: { "@type": "Answer", text: "LetMeWatch uses AI to find the perfect YouTube video for your meal based on your mood and how much time you have. Just describe your vibe and get instant recommendations — no scrolling needed." } }, { "@type": "Question", name: "What are good YouTube videos to watch while eating?", acceptedAnswer: { "@type": "Answer", text: "The best YouTube videos to watch while eating depend on your mood and meal duration. Funny videos, gaming commentary, documentaries, and video essays are popular choices. LetMeWatch AI-matches the perfect video to your exact mood." } }, { "@type": "Question", name: "How do I find a YouTube video to watch during lunch?", acceptedAnswer: { "@type": "Answer", text: "On LetMeWatch, describe your mood or pick a category, select your meal duration, and get instant AI-curated YouTube recommendations. The whole process takes under 10 seconds." } }] }) }} />
-      <div style={{
-        width: "100%",
-        maxWidth: "460px",
-        transition: "opacity 0.34s ease, transform 0.34s ease",
-        opacity: fading ? 0 : 1,
-        transform: fading ? "translateY(16px)" : "translateY(0)",
-      }}>
+    <h1 className="font-serif font-semibold text-[clamp(2rem,5vw,3.8rem)] leading-[0.98] tracking-tight text-[var(--yt-text)]">
+      {words.map((word, idx) => (
+        <motion.span
+          key={`${word}-${idx}`}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: idx * 0.05, duration: 0.32 }}
+          className="inline-block"
+        >
+          {word}
+          {idx < words.length - 1 ? "\u00A0" : ""}
+        </motion.span>
+      ))}
+    </h1>
+  );
+}
 
-        {/* ═══════════════ STEP 1 — TEMPS ═══════════════ */}
-        {step === "time" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+function StepProgress({ current }: { current: Step }) {
+  const labels = [
+    { step: "duration", label: "Temps" },
+    { step: "context", label: "Contexte" },
+    { step: "language", label: "Langue" },
+  ] as const;
+  const currentIndex = Math.max(0, labels.findIndex((item) => item.step === current));
 
-            {/* Brand + headline */}
-            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "14px", animation: "fadeInUp 0.5s ease both" }}>
-              {/* Logo pill */}
-              <div style={{ margin: "0 auto" }}>
-                <div style={{
-                  display: "inline-flex", alignItems: "center", gap: "7px",
-                  padding: "6px 14px 6px 10px",
-                  background: "rgba(239,68,68,0.1)",
-                  border: "1px solid rgba(239,68,68,0.22)",
-                  borderRadius: "999px", fontSize: "13px", fontWeight: 600,
-                  color: "#f87171", letterSpacing: "0.01em",
-                }}>
-                  <Play style={{ width: 13, height: 13 }} fill="currentColor" />
-                  LetMeWatch
-                </div>
-              </div>
-
-              {/* Headline */}
-              <div>
-                <h1 style={{
-                  fontSize: "clamp(28px,7vw,40px)", fontWeight: 800,
-                  color: "white", margin: "0 0 10px", lineHeight: 1.1,
-                  letterSpacing: "-0.02em",
-                }}>
-                  Le repas est servi.<br />
-                  <span style={{ color: "#ef4444" }}>La vidéo aussi.</span>
-                </h1>
-                <p style={{ color: S.muted, margin: 0, fontSize: "15px", lineHeight: 1.55 }}>
-                  Dis-nous combien de temps tu as.<br />On s'occupe du reste.
-                </p>
-              </div>
-            </div>
-
-            {/* Time cards */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {timeOptions.map((opt, i) => (
-                <button
-                  key={opt.value}
-                  onClick={() => handleTimeSelect(opt.value)}
-                  className="card-hover"
-                  style={{
-                    width: "100%", background: "none", border: "none",
-                    padding: 0, cursor: "pointer",
-                    animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${80 + i * 80}ms both`,
-                  }}
-                >
-                  <div style={{
-                    ...S.card, padding: "18px 20px",
-                    display: "flex", alignItems: "center", gap: "14px", textAlign: "left",
-                  }}>
-                    {/* Icon */}
-                    <div className="card-icon" style={{
-                      width: 50, height: 50,
-                      background: S.surface, borderRadius: "12px",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      border: "1px solid rgba(255,255,255,0.06)", flexShrink: 0,
-                      transition: "border-color 0.3s, color 0.3s", color: S.muted,
-                    }}>
-                      <Clock style={{ width: 21, height: 21 }} />
-                    </div>
-
-                    {/* Text */}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                        <span style={{ fontWeight: 700, fontSize: "17px", color: "white" }}>{opt.label}</span>
-                        <span style={{ fontSize: "13px", color: S.muted }}>— {opt.description}</span>
-                      </div>
-                      <p style={{ margin: "3px 0 0", fontSize: "12px", color: "rgba(248,113,113,0.75)", display: "flex", alignItems: "center", gap: "4px" }}>
-                        <Play style={{ width: 10, height: 10 }} />
-                        {opt.note}
-                      </p>
-                    </div>
-
-                    {/* Arrow */}
-                    <div className="arrow-btn" style={{
-                      width: 34, height: 34, borderRadius: "50%",
-                      background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.25s ease", flexShrink: 0,
-                    }}>
-                      <ArrowRight style={{ width: 17, height: 17, color: "#f87171" }} />
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Social proof */}
-            <p style={{ textAlign: "center", color: S.muted, fontSize: "13px", margin: 0, animation: "fadeInUp 0.5s 340ms both" }}>
-              🍜 Des milliers de repas améliorés chaque jour
-            </p>
+  return (
+    <div className="flex items-center gap-3 flex-wrap">
+      {labels.map((item, index) => {
+        const active = index <= currentIndex;
+        return (
+          <div key={item.step} className="flex items-center gap-2">
+            <motion.div
+              layout
+              className="h-1.5 rounded-full"
+              animate={{
+                width: index === currentIndex ? 46 : 18,
+                backgroundColor: active ? "var(--yt-red)" : "rgba(255,255,255,0.17)",
+              }}
+            />
+            <span className="text-[10px] uppercase tracking-[0.16em]" style={{ color: active ? "#ffd8df" : "var(--yt-muted)" }}>
+              {item.label}
+            </span>
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function Home() {
+  const router = useRouter();
+  const contextRef = useRef<HTMLInputElement>(null);
+
+  const [step, setStep] = useState<Step>("welcome");
+  const [direction, setDirection] = useState(1);
+  const [duration, setDuration] = useState<number | null>(null);
+  const [contextText, setContextText] = useState("");
+  const [contextPreset, setContextPreset] = useState<string | null>(null);
+  const [navigating, setNavigating] = useState(false);
+
+  const stepIndex = useMemo(() => STEP_ORDER.indexOf(step), [step]);
+  const toStep = (next: Step) => {
+    const nextIndex = STEP_ORDER.indexOf(next);
+    setDirection(nextIndex >= stepIndex ? 1 : -1);
+    setStep(next);
+  };
+
+  const launch = (language: Language, surprise = false) => {
+    const finalContext = contextText.trim() || contextPreset || "interesting popular trending";
+    const params = new URLSearchParams({
+      mood: surprise ? "surprise" : finalContext,
+      duration: String(duration ?? 30),
+      language: surprise ? "any" : language,
+      surprise: String(surprise),
+    });
+    setNavigating(true);
+    window.setTimeout(() => router.push(`/results?${params.toString()}`), 260);
+  };
+
+  return (
+    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
+      <AnimatePresence>
+        {navigating && (
+          <motion.div
+            className="curtain-wipe"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.32, ease: [0.65, 0, 0.35, 1] }}
+          />
         )}
+      </AnimatePresence>
 
-        {/* ═══════════════ STEP 2 — RECHERCHE ═══════════════ */}
-        {step === "search" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-
-            {/* Back + recap */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <button
-                onClick={() => { setTime(null); goTo("time"); }}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "5px",
-                  fontSize: "13px", color: S.muted, background: "none",
-                  border: "none", cursor: "pointer", padding: 0,
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                onMouseLeave={e => (e.currentTarget.style.color = S.muted)}
-              >
-                <ChevronLeft style={{ width: 15, height: 15 }} /> Retour
-              </button>
-              {/* Duration pill */}
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: "5px",
-                padding: "5px 12px", background: "rgba(239,68,68,0.12)",
-                border: "1px solid rgba(239,68,68,0.25)", borderRadius: "999px",
-                fontSize: "12px", fontWeight: 600, color: "#f87171",
-              }}>
-                <Clock style={{ width: 11, height: 11 }} />
-                {time} min
-              </div>
+      <div className="mx-auto max-w-7xl">
+        <header className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <motion.div
+              whileHover={{ scale: 1.06, rotate: -2 }}
+              transition={{ type: "spring", stiffness: 330, damping: 22 }}
+              className="grid h-10 w-10 place-content-center rounded-xl bg-[var(--yt-red)] text-white shadow-[0_12px_26px_rgba(255,39,72,0.35)]"
+            >
+              <Youtube size={18} />
+            </motion.div>
+            <div>
+              <p className="font-serif text-xl font-semibold leading-none text-[var(--yt-text)]">LetMeWatch</p>
+              <p className="mt-0.5 text-[11px] uppercase tracking-[0.14em] text-[var(--yt-muted)]">Smart picks</p>
             </div>
+          </div>
 
-            {/* Headline */}
-            <div style={{ animation: "fadeInUp 0.4s ease both" }}>
-              <h2 style={{ fontSize: "22px", fontWeight: 700, color: "white", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
-                Qu'est-ce qu'on regarde ?
-              </h2>
-              <p style={{ color: S.muted, margin: 0, fontSize: "13px" }}>
-                Décris ce que tu veux — ou choisis une ambiance ci-dessous
-              </p>
-            </div>
+          {step !== "welcome" && (
+            <button onClick={() => toStep("welcome")} className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
+              Recommencer
+            </button>
+          )}
+        </header>
 
-            {/* ── SEARCH BAR (prominent) ── */}
-            <div style={{ animation: "fadeInUp 0.4s 60ms ease both", position: "relative" }}>
-              <div style={{
-                position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)",
-                color: S.muted, pointerEvents: "none", display: "flex",
-              }}>
-                <Search style={{ width: 18, height: 18 }} />
-              </div>
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Ex : documentaire nature, humour, gaming, cuisine…"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                style={{
-                  width: "100%", height: "54px",
-                  paddingLeft: "46px", paddingRight: text.trim() ? "52px" : "16px",
-                  fontSize: "15px", fontFamily: "inherit",
-                  background: "#1c1917",
-                  border: "1.5px solid rgba(255,255,255,0.1)",
-                  borderRadius: "14px", color: "white",
-                  outline: "none", boxSizing: "border-box",
-                  transition: "border-color 0.2s, box-shadow 0.2s",
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = "rgba(239,68,68,0.55)";
-                  e.target.style.boxShadow = "0 0 0 3px rgba(239,68,68,0.1)";
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-              {text.trim() && (
-                <button
-                  onClick={handleTextSubmit}
-                  style={{
-                    position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)",
-                    width: 38, height: 38, borderRadius: "10px",
-                    background: S.red, border: "none", cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "white", transition: "background 0.2s",
-                    boxShadow: "0 2px 12px rgba(239,68,68,0.4)",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "#dc2626")}
-                  onMouseLeave={e => (e.currentTarget.style.background = S.red)}
-                >
-                  <ArrowRight style={{ width: 16, height: 16 }} />
-                </button>
+        <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+          <section className="bistro-card relative overflow-hidden rounded-[30px] p-7 md:p-10">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.35)] to-transparent" />
+            {step !== "welcome" && <div className="mb-6"><StepProgress current={step} /></div>}
+
+            <AnimatePresence custom={direction} mode="wait">
+              {step === "welcome" && (
+                <motion.div key="welcome" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
+                  <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#ff8da0]">Clair et immédiat</p>
+                  <SplitTitle text="T'en as marre de scroller sans savoir quoi lancer ?" />
+                  <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[var(--yt-muted)] md:text-base">
+                    3 étapes rapides. Tu donnes ton timing, ton contexte et ta langue. On te propose directement des vidéos regardables.
+                  </p>
+
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <motion.button
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => toStep("duration")}
+                      className="yt-button flex items-center justify-center gap-2 rounded-2xl bg-[var(--yt-red)] px-6 py-4 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(255,39,72,0.34)] md:text-base"
+                    >
+                      Commencer
+                      <ChevronRight size={18} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => launch("any", true)}
+                      className="yt-button flex items-center justify-center gap-2 rounded-2xl border border-[var(--yt-border-strong)] bg-[rgba(29,31,34,0.92)] px-6 py-4 text-sm font-semibold text-[var(--yt-text)] md:text-base"
+                    >
+                      <Shuffle size={16} />
+                      Surprise directe
+                    </motion.button>
+                  </div>
+                </motion.div>
               )}
-            </div>
 
-            {/* ── Divider ── */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: "12px",
-              animation: "fadeInUp 0.4s 100ms ease both",
-            }}>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
-              <span style={{ fontSize: "12px", color: S.muted, whiteSpace: "nowrap" }}>ou une ambiance</span>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
-            </div>
-
-            {/* ── CATEGORIES GRID ── */}
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px",
-              animation: "fadeInUp 0.4s 140ms ease both",
-            }}>
-              {categories.map(c => (
-                <button
-                  key={c.id}
-                  onClick={() => launch(c.id)}
-                  style={{
-                    background: "#1c1917",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: "12px", padding: "12px 14px",
-                    cursor: "pointer", textAlign: "left",
-                    transition: "background 0.18s, border-color 0.18s, transform 0.18s",
-                    display: "flex", alignItems: "center", gap: "10px",
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = "#26201d";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = "#1c1917";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
-                >
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "8px",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    background: c.bg, color: c.color, flexShrink: 0,
-                  }}>
-                    {c.icon}
+              {step === "duration" && (
+                <motion.div key="duration" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Combien de temps tu as ?</h2>
+                  <p className="mt-2 text-[var(--yt-muted)]">On calibre la durée des vidéos sur ton vrai timing.</p>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {DURATIONS.map((item, index) => (
+                      <motion.button
+                        key={item.value}
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.06 }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setDuration(item.value);
+                          toStep("context");
+                          window.setTimeout(() => contextRef.current?.focus(), 360);
+                        }}
+                        className="yt-button yt-card rounded-2xl p-4 text-left"
+                      >
+                        <p className="text-xs uppercase tracking-[0.16em] text-[#ff92a5]">{item.note}</p>
+                        <p className="mt-2 font-serif text-3xl font-semibold text-[var(--yt-text)]">{item.label}</p>
+                        <p className="mt-1 text-xs text-[var(--yt-muted)]">Session optimisée</p>
+                      </motion.button>
+                    ))}
                   </div>
-                  <span style={{ fontWeight: 600, fontSize: "13px", color: "white" }}>
-                    {c.label}
-                  </span>
-                </button>
+                  <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
+
+              {step === "context" && (
+                <motion.div key="context" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Décris ce que t'as envie de regarder</h2>
+                  <p className="mt-2 text-[var(--yt-muted)]">Tu peux écrire naturellement. Le texte libre est prioritaire.</p>
+
+                  <div className="yt-input-wrap mt-5 rounded-3xl p-5">
+                    <label htmlFor="watch-context" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--yt-text)]">
+                      Ton texte libre
+                    </label>
+                    <p className="mt-1 text-sm text-[var(--yt-muted)]">Ex: "quelque chose de captivant, pas bruyant, autour de 25 min"</p>
+                    <div className="relative mt-3">
+                      <input
+                        id="watch-context"
+                        ref={contextRef}
+                        type="text"
+                        value={contextText}
+                        onChange={(e) => {
+                          setContextText(e.target.value);
+                          if (e.target.value) setContextPreset(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && contextText.trim()) toStep("language");
+                        }}
+                        placeholder="Décris exactement ce que tu veux regarder..."
+                        className="yt-input w-full rounded-2xl px-4 py-4 pr-32 text-sm outline-none"
+                      />
+                      <button
+                        onClick={() => contextText.trim() && toStep("language")}
+                        disabled={!contextText.trim()}
+                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--yt-red)] px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_18px_rgba(255,39,72,0.24)] disabled:opacity-40"
+                      >
+                        Continuer
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[var(--yt-muted)]">Ou utilise un raccourci</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                    {CONTEXT_PRESETS.map((item, index) => (
+                      <motion.button
+                        key={item.value}
+                        initial={{ opacity: 0, scale: 0.94 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.03 }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                          setContextPreset(item.value);
+                          setContextText("");
+                          toStep("language");
+                        }}
+                        className="yt-button rounded-xl border px-3 py-3 text-center text-sm"
+                        style={{
+                          borderColor: contextPreset === item.value && !contextText ? "rgba(255, 39, 72, 0.48)" : "var(--yt-border)",
+                          background: contextPreset === item.value && !contextText ? "rgba(255, 39, 72, 0.16)" : "rgba(29, 31, 34, 0.9)",
+                        }}
+                      >
+                        <span className="block font-semibold text-[var(--yt-text)]">{item.label}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <button onClick={() => toStep("duration")} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
+
+              {step === "language" && (
+                <motion.div key="language" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Quelle langue préférée ?</h2>
+                  <p className="mt-2 text-[var(--yt-muted)]">Dernière étape, puis on lance les recommandations.</p>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {LANGUAGES.map((item, index) => (
+                      <motion.button
+                        key={item.value}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.06 }}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => launch(item.value)}
+                        className="yt-button yt-card rounded-2xl p-5 text-center"
+                      >
+                        <p className="text-4xl">{item.icon}</p>
+                        <p className="mt-3 font-serif text-2xl font-semibold text-[var(--yt-text)]">{item.label}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                  <button onClick={() => toStep("context")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                    <ChevronLeft size={14} /> Retour
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+
+          <aside className="bistro-card h-fit rounded-[30px] p-6 md:p-7">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff95a8]">Comment ça marche</p>
+            <div className="mt-4 space-y-3">
+              {[
+                { icon: Clock3, title: "1. Durée", text: "15 min, 30 min ou 1h+." },
+                { icon: MessageSquareText, title: "2. Contexte", text: "Texte libre ou preset rapide." },
+                { icon: Globe, title: "3. Langue", text: "FR, EN ou peu importe." },
+              ].map((item) => (
+                <motion.div
+                  key={item.title}
+                  whileHover={{ y: -2 }}
+                  className="rounded-xl border border-[var(--yt-border)] bg-[rgba(20,22,25,0.9)] p-4"
+                >
+                  <div className="flex gap-3">
+                    <item.icon size={16} className="mt-0.5 text-[#ff8ca1]" />
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--yt-text)]">{item.title}</p>
+                      <p className="mt-1 text-xs text-[var(--yt-muted)]">{item.text}</p>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
 
-            <p style={{ textAlign: "center", color: S.muted, fontSize: "12px", margin: 0 }}>
-              Appuie sur <kbd style={{ background: "#26201d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px", padding: "1px 6px", fontSize: "11px", fontFamily: "inherit" }}>Entrée</kbd> pour lancer la recherche
-            </p>
-          </div>
-        )}
+            <div className="mt-5 rounded-2xl border border-[var(--yt-border)] bg-[rgba(20,22,25,0.9)] p-4">
+              <p className="text-sm font-semibold text-[var(--yt-text)]">Résultat attendu</p>
+              <p className="mt-1 text-xs text-[var(--yt-muted)]">Des recommandations claires, directement regardables, sans perte de temps.</p>
+            </div>
+          </aside>
+        </div>
       </div>
     </main>
   );
