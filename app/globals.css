@@ -10,18 +10,18 @@
 }
 
 :root {
-  --yt-bg: #0f0f10;
-  --yt-bg-soft: #161719;
-  --yt-panel: #1d1f22;
-  --yt-panel-2: #23262a;
+  --yt-bg: #0f0f0f;
+  --yt-bg-soft: #131416;
+  --yt-panel: #1e2023;
+  --yt-panel-2: #24272b;
   --yt-border: rgba(255, 255, 255, 0.1);
   --yt-border-strong: rgba(255, 255, 255, 0.18);
   --yt-text: #f7f8fa;
   --yt-muted: rgba(247, 248, 250, 0.64);
-  --yt-red: #ff2748;
-  --yt-red-strong: #df1838;
+  --yt-red: #ff0033;
+  --yt-red-strong: #d90f33;
   --charcoal: #f7f8fa;
-  --wine: #ff2748;
+  --wine: #ff0033;
 }
 
 html {
@@ -34,9 +34,9 @@ body {
   color: var(--yt-text);
   font-family: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, sans-serif;
   background:
-    radial-gradient(circle at 10% -8%, rgba(255, 39, 72, 0.2), transparent 34%),
-    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.06), transparent 38%),
-    linear-gradient(180deg, #0f0f10, #121317 40%, #0e0f13);
+    radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.045), transparent 32%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.03), transparent 42%),
+    linear-gradient(180deg, #0f0f0f, #121316 44%, #101114);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -50,18 +50,15 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at center, black 34%, transparent 100%);
-  opacity: 0.45;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 0.6px, transparent 0.6px);
+  background-size: 3px 3px;
+  opacity: 0.2;
 }
 
 .bistro-card {
   border: 1px solid var(--yt-border);
-  background: linear-gradient(160deg, rgba(29, 31, 34, 0.9), rgba(24, 25, 27, 0.9));
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(160deg, rgba(30, 32, 35, 0.92), rgba(24, 26, 29, 0.92));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
   backdrop-filter: blur(10px);
 }
 
@@ -95,7 +92,7 @@ body {
 }
 
 .yt-button {
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.24s ease, background-color 0.24s ease;
 }
 
 .yt-button:hover {
@@ -115,7 +112,7 @@ body {
 
 .yt-card:hover {
   border-color: var(--yt-border-strong);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36);
 }
 
 .curtain-wipe {
@@ -137,7 +134,7 @@ body {
   inset: -1px;
   border-radius: inherit;
   pointer-events: none;
-  border: 1px solid rgba(255, 39, 72, 0.28);
+  border: 1px solid rgba(255, 0, 51, 0.32);
   opacity: 0;
   transition: opacity 0.2s ease;
 }

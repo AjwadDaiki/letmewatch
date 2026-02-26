@@ -198,7 +198,7 @@ export default function Home() {
                 <motion.div key="welcome" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
                   <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--yt-border)] bg-[rgba(25,27,30,0.9)] px-3 py-1.5">
                     <Sparkles size={13} className="text-[#ff8da0]" />
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff8da0]">Clair et immediat</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff5f7e]">Clair et immediat</p>
                   </div>
                   <SplitTitle text="T'en as marre de scroller sans savoir quoi lancer ?" />
                   <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[var(--yt-muted)] md:text-base">
@@ -254,7 +254,7 @@ export default function Home() {
                       </motion.button>
                     ))}
                   </div>
-                  <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                  <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff6b87]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
@@ -322,7 +322,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <button onClick={() => toStep("duration")} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                  <button onClick={() => toStep("duration")} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[#ff6b87]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
@@ -350,7 +350,7 @@ export default function Home() {
                       </motion.button>
                     ))}
                   </div>
-                  <button onClick={() => toStep("context")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff9daf]">
+                  <button onClick={() => toStep("context")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#ff6b87]">
                     <ChevronLeft size={14} /> Retour
                   </button>
                 </motion.div>
@@ -359,7 +359,7 @@ export default function Home() {
           </section>
 
           <aside className="bistro-card h-fit rounded-[30px] p-6 md:p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff95a8]">Comment ca marche</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff5f7e]">Comment ca marche</p>
             <div className="mt-4 space-y-3">
               {[
                 { icon: Clock3, title: "1. Duree", text: "15 min, 30 min ou 1h+." },
@@ -372,7 +372,7 @@ export default function Home() {
                   className="rounded-xl border border-[var(--yt-border)] bg-[rgba(20,22,25,0.9)] p-4"
                 >
                   <div className="flex gap-3">
-                    <item.icon size={16} className="mt-0.5 text-[#ff8ca1]" />
+                    <item.icon size={16} className="mt-0.5 text-[#ff5f7e]" />
                     <div>
                       <p className="text-sm font-semibold text-[var(--yt-text)]">{item.title}</p>
                       <p className="mt-1 text-xs text-[var(--yt-muted)]">{item.text}</p>
