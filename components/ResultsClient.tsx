@@ -38,22 +38,17 @@ function formatDuration(seconds: number): string {
 
 function getMoodLabel(mood: string, isSurprise: boolean): string {
   if (isSurprise) return "Surprise";
-  const first = mood.split(" ")[0] || "contexte";
-  return first.charAt(0).toUpperCase() + first.slice(1);
+  const map: Record<string, string> = {
+    funny: "Drôle", chill: "Détente", educational: "Éducatif", gaming: "Gaming",
+    cooking: "Cuisine", cinema: "Cinéma", music: "Musique", science: "Science",
+    travel: "Voyage", surprise: "Surprise",
+  };
+  const first = mood.split(" ")[0] || mood;
+  return map[first] || (first.charAt(0).toUpperCase() + first.slice(1));
 }
 
-function languageFlag(language: string): string {
-  if (language === "fr") return "🇫🇷";
-  if (language === "en") return "🇬🇧";
-  return "🌐";
-}
-
-function VideoCard({
-  video,
-  onReject,
-  onBlacklist,
-  onPlay,
-}: {
+/* ── Video card — full dark ── */
+function VideoCard({ video, onReject, onBlacklist, onPlay }: {
   video: Video;
   onReject: (id: string) => void;
   onBlacklist: (video: Video) => void;
@@ -62,172 +57,216 @@ function VideoCard({
   const [isPlaying, setIsPlaying] = useState(false);
   const [showBlacklist, setShowBlacklist] = useState(false);
 
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-120, 120], [-5, 5]);
-  const opacity = useTransform(x, [-150, -30, 0, 30, 150], [0, 0.85, 1, 0.85, 0]);
-
-  const handlePlay = () => {
-    onPlay(video);
-    setIsPlaying(true);
-  };
+  const x       = useMotionValue(0);
+  const rotate  = useTransform(x, [-120, 120], [-4, 4]);
+  const opacity = useTransform(x, [-150, -30, 0, 30, 150], [0, 0.9, 1, 0.9, 0]);
 
   return (
     <motion.article
       drag="x"
       dragElastic={0.18}
       dragConstraints={{ left: 0, right: 0 }}
-      onDragEnd={(_, info) => {
-        if (Math.abs(info.offset.x) > 85) onReject(video.id);
-      }}
+      onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 85) onReject(video.id); }}
       layout
-      initial={{ opacity: 0, y: 24, scale: 0.97 }}
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, x: -50, scale: 0.94, transition: { duration: 0.2 } }}
-      transition={{ duration: 0.3 }}
-      style={{ x, rotate, opacity }}
-      className="group rounded-[22px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.9)] overflow-hidden shadow-[0_12px_30px_rgba(15,15,16,0.08)]"
+      transition={{ duration: 0.28 }}
+      style={{ x, rotate, opacity, position: "relative" }}
+      className="group"
+      css-override="true"
     >
-      <div className="relative" style={{ aspectRatio: "16/9" }}>
-        {isPlaying ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-            className="h-full w-full"
-            style={{ border: "none" }}
-          />
-        ) : (
-          <>
-            <img
-              src={video.thumbnail}
-              alt={video.title}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
-              }}
-              draggable={false}
+      <div style={{
+        background: "#1c1917",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "18px",
+        overflow: "hidden",
+      }}>
+        {/* Thumbnail */}
+        <div style={{ position: "relative", aspectRatio: "16/9" }}>
+          {isPlaying ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
+          ) : (
+            <>
+              <img
+                src={video.thumbnail}
+                alt={video.title}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
+                onError={e => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`; }}
+                draggable={false}
+                className="group-hover:scale-[1.03]"
+              />
 
-            <button
-              onClick={handlePlay}
-              className="absolute inset-0 grid place-content-center"
-              style={{
-                background: "linear-gradient(180deg, rgba(29,23,19,0.05), rgba(29,23,19,0.35))",
-              }}
-            >
-              <span className="h-14 w-14 rounded-full bg-white text-[var(--wine)] grid place-content-center shadow-[0_8px_20px_rgba(15,15,16,0.26)] transition-transform group-hover:scale-105">
-                <Play size={22} fill="currentColor" style={{ marginLeft: 2 }} />
-              </span>
-            </button>
-
-            <span className="absolute right-2 bottom-2 rounded-md bg-[rgba(29,23,19,0.85)] px-2 py-0.5 text-xs font-semibold text-[#f4ecdf]">
-              {formatDuration(video.duration)}
-            </span>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onReject(video.id);
-              }}
-              className="absolute right-2 top-2 h-8 w-8 rounded-full bg-[rgba(29,23,19,0.55)] text-[#f4ecdf] grid place-content-center opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              <X size={14} />
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="p-4">
-        <h3 className="line-clamp-2 min-h-10 font-semibold text-[14px] text-[var(--charcoal)]">
-          {video.title}
-        </h3>
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="truncate text-xs text-[rgba(43,33,28,0.7)]" title={video.channelTitle}>
-            {video.channelTitle}
-          </span>
-
-          <div className="flex items-center gap-1">
-            <a
-              href={`https://youtube.com/watch?v=${video.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="yt-button rounded-lg border border-[rgba(15,15,16,0.14)] p-1.5 text-[rgba(15,15,16,0.7)] hover:text-[var(--charcoal)]"
-              onClick={(e) => e.stopPropagation()}
-              title="Ouvrir sur YouTube"
-            >
-              <ExternalLink size={13} />
-            </a>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowBlacklist(true);
-              }}
-              className="yt-button rounded-lg border border-[rgba(15,15,16,0.14)] p-1.5 text-[var(--wine)]"
-              title="Ne plus voir cette chaine"
-            >
-              <Ban size={13} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {showBlacklist && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[rgba(29,23,19,0.93)] p-5 text-[#f4ecdf]"
-          >
-            <p className="text-center text-sm leading-relaxed">
-              Retirer definitivement <span className="text-[#e9b2b8]">{video.channelTitle}</span> ?
-            </p>
-            <div className="flex gap-3">
+              {/* Play button */}
               <button
-                onClick={() => {
-                  onBlacklist(video);
-                  setShowBlacklist(false);
+                onClick={() => { onPlay(video); setIsPlaying(true); }}
+                style={{
+                  position: "absolute", inset: 0,
+                  display: "grid", placeContent: "center",
+                  background: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.4))",
+                  border: "none", cursor: "pointer",
                 }}
-                className="rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white"
               >
-                Blacklister
+                <span style={{
+                  width: 52, height: 52, borderRadius: "50%",
+                  background: "#ef4444",
+                  display: "grid", placeContent: "center",
+                  boxShadow: "0 6px 24px rgba(239,68,68,0.5)",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                }}
+                  className="group-hover:scale-105"
+                >
+                  <Play size={20} fill="white" color="white" style={{ marginLeft: 2 }} />
+                </span>
               </button>
+
+              {/* Duration badge */}
+              <span style={{
+                position: "absolute", right: 8, bottom: 8,
+                background: "rgba(0,0,0,0.82)", borderRadius: "6px",
+                padding: "2px 8px", fontSize: "11px", fontWeight: 700,
+                color: "white", letterSpacing: "0.02em",
+              }}>
+                {formatDuration(video.duration)}
+              </span>
+
+              {/* Reject button */}
               <button
-                onClick={() => setShowBlacklist(false)}
-                className="rounded-xl border border-[rgba(247,239,225,0.25)] px-4 py-2 text-xs font-semibold"
+                onClick={e => { e.stopPropagation(); onReject(video.id); }}
+                style={{
+                  position: "absolute", right: 8, top: 8,
+                  width: 30, height: 30, borderRadius: "50%",
+                  background: "rgba(0,0,0,0.65)", border: "none",
+                  color: "rgba(255,255,255,0.85)", cursor: "pointer",
+                  display: "grid", placeContent: "center",
+                  opacity: 0, transition: "opacity 0.2s",
+                }}
+                className="group-hover:!opacity-100"
               >
-                Annuler
+                <X size={13} />
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Info */}
+        <div style={{ padding: "14px 16px" }}>
+          <h3 style={{
+            margin: "0 0 10px", fontSize: "14px", fontWeight: 600,
+            color: "white", lineHeight: 1.45,
+          }} className="line-clamp-2">
+            {video.title}
+          </h3>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span style={{
+              fontSize: "12px", color: "rgba(255,255,255,0.45)",
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {video.channelTitle}
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              <a
+                href={`https://youtube.com/watch?v=${video.id}`}
+                target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                style={{
+                  display: "grid", placeContent: "center",
+                  width: 28, height: 28, borderRadius: "8px",
+                  background: "#26201d", border: "1px solid rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.5)", transition: "color 0.15s",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+                title="Ouvrir sur YouTube"
+              >
+                <ExternalLink size={12} />
+              </a>
+              <button
+                onClick={e => { e.stopPropagation(); setShowBlacklist(true); }}
+                style={{
+                  display: "grid", placeContent: "center",
+                  width: 28, height: 28, borderRadius: "8px",
+                  background: "#26201d", border: "1px solid rgba(239,68,68,0.18)",
+                  color: "rgba(239,68,68,0.65)", cursor: "pointer", transition: "color 0.15s",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#ef4444")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(239,68,68,0.65)")}
+                title="Ne plus voir cette chaîne"
+              >
+                <Ban size={12} />
               </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Blacklist confirm */}
+        <AnimatePresence>
+          {showBlacklist && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{
+                position: "absolute", inset: 0, borderRadius: "18px",
+                background: "rgba(12,10,9,0.94)",
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", gap: 16, padding: 20,
+              }}
+            >
+              <p style={{ textAlign: "center", fontSize: "14px", color: "rgba(255,255,255,0.85)", lineHeight: 1.5, margin: 0 }}>
+                Masquer définitivement <span style={{ color: "#f87171", fontWeight: 600 }}>{video.channelTitle}</span> ?
+              </p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => { onBlacklist(video); setShowBlacklist(false); }}
+                  style={{
+                    padding: "8px 18px", background: "#ef4444", border: "none",
+                    borderRadius: "10px", fontSize: "13px", fontWeight: 600,
+                    color: "white", cursor: "pointer",
+                  }}
+                >
+                  Masquer
+                </button>
+                <button
+                  onClick={() => setShowBlacklist(false)}
+                  style={{
+                    padding: "8px 18px",
+                    background: "#26201d", border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "10px", fontSize: "13px", fontWeight: 600,
+                    color: "rgba(255,255,255,0.7)", cursor: "pointer",
+                  }}
+                >
+                  Annuler
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.article>
   );
 }
 
+/* ── Dark loading skeleton ── */
 function LoadingSkeleton() {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="overflow-hidden rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.86)]"
-        >
-          <div
-            style={{
-              aspectRatio: "16/9",
-              background:
-                "linear-gradient(90deg, rgba(255,0,51,0.08) 25%, rgba(255,255,255,0.82) 50%, rgba(255,0,51,0.08) 75%)",
-              backgroundSize: "200% 100%",
-              animation: "shimmer 1.5s infinite",
-            }}
-          />
-          <div className="space-y-2 p-4">
-            <div className="h-4 rounded bg-[rgba(43,33,28,0.1)]" />
-            <div className="h-4 w-3/4 rounded bg-[rgba(43,33,28,0.08)]" />
-            <div className="h-3 w-1/3 rounded bg-[rgba(43,33,28,0.06)]" />
+      {[1, 2, 3].map(i => (
+        <div key={i} style={{ background: "#1c1917", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", overflow: "hidden" }}>
+          <div style={{
+            aspectRatio: "16/9",
+            background: "linear-gradient(90deg, #1c1917 25%, #26201d 50%, #1c1917 75%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.6s infinite",
+          }} />
+          <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ height: 13, borderRadius: 6, background: "rgba(255,255,255,0.07)" }} />
+            <div style={{ height: 13, width: "72%", borderRadius: 6, background: "rgba(255,255,255,0.05)" }} />
+            <div style={{ height: 10, width: "40%", borderRadius: 6, background: "rgba(255,255,255,0.04)", marginTop: 4 }} />
           </div>
         </div>
       ))}
@@ -235,103 +274,75 @@ function LoadingSkeleton() {
   );
 }
 
+/* ──────────────────────────────────────────── */
 export default function ResultsClient() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router       = useRouter();
 
-  const mood = searchParams.get("mood") || "interesting";
-  const duration = parseInt(searchParams.get("duration") || "30", 10);
-  const language = searchParams.get("language") || "any";
+  const mood       = searchParams.get("mood")     || "interesting";
+  const duration   = parseInt(searchParams.get("duration") || "30", 10);
+  const language   = searchParams.get("language") || "fr";
   const isSurprise = searchParams.get("surprise") === "true";
 
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [allVideos, setAllVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [reason, setReason] = useState("");
+  const [videos,       setVideos]       = useState<Video[]>([]);
+  const [allVideos,    setAllVideos]    = useState<Video[]>([]);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState("");
+  const [reason,       setReason]       = useState("");
   const [shareSuccess, setShareSuccess] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [history, setHistory] = useState<VideoItem[]>([]);
+  const [showHistory,  setShowHistory]  = useState(false);
+  const [history,      setHistory]      = useState<VideoItem[]>([]);
 
-  const fetchVideos = useCallback(
-    async (rejectedIds: string[] = []) => {
-      setLoading(true);
-      setError("");
+  const fetchVideos = useCallback(async (rejectedIds: string[] = []) => {
+    setLoading(true);
+    setError("");
+    try {
+      const currentHistory = getHistory();
+      const blacklist      = getBlacklist();
+      setHistory(currentHistory);
 
-      try {
-        const currentHistory = getHistory();
-        const blacklist = getBlacklist();
-        setHistory(currentHistory);
+      const res = await fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mood, duration, language, isSurprise, history: currentHistory.map(v => v.id), blacklist }),
+      });
 
-        const res = await fetch("/api/match", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            mood,
-            duration,
-            language,
-            isSurprise,
-            history: currentHistory.map((v) => v.id),
-            blacklist,
-          }),
-        });
-
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Erreur lors de la recherche");
-        }
-
-        const data = await res.json();
-        const filtered = (data.videos || []).filter((v: Video) => !rejectedIds.includes(v.id));
-
-        setAllVideos(filtered);
-        setVideos(filtered.slice(0, 3));
-        setReason(data.reason || "");
-      } catch (err: unknown) {
-        if (err instanceof Error) setError(err.message);
-        else setError("Une erreur est survenue");
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Erreur lors de la recherche");
       }
-    },
-    [duration, isSurprise, language, mood]
-  );
 
-  useEffect(() => {
-    fetchVideos();
-  }, [fetchVideos]);
+      const data     = await res.json();
+      const filtered = (data.videos || []).filter((v: Video) => !rejectedIds.includes(v.id));
+      setAllVideos(filtered);
+      setVideos(filtered.slice(0, 3));
+      setReason(data.reason || "");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setLoading(false);
+    }
+  }, [duration, isSurprise, language, mood]);
+
+  useEffect(() => { fetchVideos(); }, [fetchVideos]);
 
   const handleReject = (videoId: string) => {
-    const remaining = videos.filter((v) => v.id !== videoId);
-    const rejectedSet = videos.filter((v) => v.id === videoId).map((v) => v.id);
-
-    const usedIds = new Set([...remaining.map((v) => v.id), ...rejectedSet]);
-    const nextVideo = allVideos.find((v) => !usedIds.has(v.id));
-
-    if (nextVideo) {
-      setVideos([...remaining, nextVideo]);
-    } else {
-      setVideos(remaining);
-      if (remaining.length < 2) fetchVideos([...rejectedSet]);
-    }
+    const remaining  = videos.filter(v => v.id !== videoId);
+    const rejectedSet = [videoId];
+    const usedIds    = new Set([...remaining.map(v => v.id), ...rejectedSet]);
+    const next       = allVideos.find(v => !usedIds.has(v.id));
+    if (next) setVideos([...remaining, next]);
+    else { setVideos(remaining); if (remaining.length < 2) fetchVideos(rejectedSet); }
   };
 
   const handleBlacklist = (video: Video) => {
     addToBlacklist(video.channelId);
-    setVideos((prev) => prev.filter((v) => v.channelId !== video.channelId));
-    setAllVideos((prev) => prev.filter((v) => v.channelId !== video.channelId));
+    setVideos(prev => prev.filter(v => v.channelId !== video.channelId));
+    setAllVideos(prev => prev.filter(v => v.channelId !== video.channelId));
   };
 
   const handlePlay = (video: Video) => {
-    addToHistory({
-      id: video.id,
-      title: video.title,
-      channelId: video.channelId,
-      channelTitle: video.channelTitle,
-      thumbnail: video.thumbnail,
-      duration: video.duration,
-      watchedAt: Date.now(),
-    });
+    addToHistory({ id: video.id, title: video.title, channelId: video.channelId, channelTitle: video.channelTitle, thumbnail: video.thumbnail, duration: video.duration, watchedAt: Date.now() });
     setHistory(getHistory());
   };
 
@@ -340,133 +351,145 @@ export default function ResultsClient() {
       await navigator.clipboard.writeText(window.location.href);
       setShareSuccess(true);
       window.setTimeout(() => setShareSuccess(false), 2200);
-    } catch {
-      setShareSuccess(false);
-    }
+    } catch { setShareSuccess(false); }
   };
 
   const handleSurprise = () => {
-    const params = new URLSearchParams({
-      mood: "surprise",
-      duration: String(duration),
-      language: "any",
-      surprise: "true",
-    });
-    router.push(`/results?${params.toString()}`);
+    router.push(`/results?mood=surprise&duration=${duration}&language=${language}&surprise=true`);
+  };
+
+  /* ── Shared button style ── */
+  const btnBase: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 6,
+    padding: "7px 14px", borderRadius: "10px",
+    background: "#1c1917", border: "1px solid rgba(255,255,255,0.09)",
+    color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: 500,
+    cursor: "pointer", transition: "all 0.18s ease",
   };
 
   return (
-    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl">
+    <main style={{ minHeight: "100vh", padding: "20px 16px", fontFamily: "var(--font-outfit,'Inter',sans-serif)" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
+
+        {/* ── Header ── */}
         <motion.header
-          initial={{ opacity: 0, y: -14 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="mb-6 rounded-[24px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.88)] p-4 md:p-5"
+          transition={{ duration: 0.3 }}
+          style={{
+            background: "#1c1917",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "18px", padding: "14px 18px",
+          }}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
             <button
               onClick={() => router.push("/")}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--wine)]"
+              style={{ ...btnBase, padding: "7px 12px" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "white"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}
             >
-              <ArrowLeft size={16} /> Revenir
+              <ArrowLeft size={15} /> Revenir
             </button>
 
-            <p className="font-serif font-semibold text-[clamp(1.2rem,3.5vw,1.8rem)] text-[var(--charcoal)]">
+            <p style={{ fontWeight: 700, fontSize: "clamp(16px,3vw,20px)", color: "white", margin: 0 }}>
               Tes recommandations
             </p>
 
-            <div className="flex items-center gap-2">
+            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              {/* History */}
               <button
-                onClick={() => {
-                  setHistory(getHistory());
-                  setShowHistory((prev) => !prev);
-                }}
-                className="yt-button relative rounded-xl border border-[rgba(15,15,16,0.14)] bg-white p-2 text-[var(--charcoal)]"
+                onClick={() => { setHistory(getHistory()); setShowHistory(p => !p); }}
+                style={{ ...btnBase, padding: "7px 10px", position: "relative" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
                 title="Historique"
               >
-                <History size={16} />
+                <History size={15} />
                 {history.length > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-4 w-4 place-content-center rounded-full bg-[var(--wine)] text-[9px] font-bold text-white">
-                    {history.length}
-                  </span>
+                  <span style={{
+                    position: "absolute", top: -4, right: -4,
+                    width: 16, height: 16, borderRadius: "50%",
+                    background: "#ef4444", fontSize: "9px", fontWeight: 700,
+                    color: "white", display: "grid", placeContent: "center",
+                  }}>{history.length}</span>
                 )}
               </button>
 
+              {/* Surprise */}
               <button
                 onClick={handleSurprise}
-                className="yt-button inline-flex items-center gap-1.5 rounded-xl border border-[rgba(15,15,16,0.14)] bg-white px-3 py-2 text-sm font-semibold text-[var(--wine)]"
+                style={{ ...btnBase }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
               >
                 <Shuffle size={14} /> Surprise
               </button>
 
+              {/* Refresh */}
               <button
                 onClick={() => fetchVideos()}
-                className="yt-button rounded-xl border border-[rgba(15,15,16,0.14)] bg-white p-2 text-[var(--charcoal)]"
-                title="Rafraichir"
+                style={{ ...btnBase, padding: "7px 10px" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                title="Rafraîchir"
               >
-                <RefreshCw size={16} />
+                <RefreshCw size={15} />
               </button>
 
+              {/* Share */}
               <button
                 onClick={handleShare}
-                className="yt-button inline-flex items-center gap-1.5 rounded-xl border border-[rgba(15,15,16,0.14)] bg-white px-3 py-2 text-sm font-semibold text-[var(--charcoal)]"
+                style={{ ...btnBase }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
               >
                 {shareSuccess ? <Check size={14} /> : <Share2 size={14} />}
-                {shareSuccess ? "Copie" : "Partager"}
+                {shareSuccess ? "Copié !" : "Partager"}
               </button>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full border border-[rgba(255,0,51,0.28)] bg-[rgba(255,0,51,0.08)] px-3 py-1 font-semibold text-[var(--wine)]">
+          {/* Pills */}
+          <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+            <span style={{ padding: "4px 12px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "999px", fontSize: "12px", fontWeight: 600, color: "#f87171" }}>
               {duration} min
             </span>
-            <span className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white px-3 py-1 font-semibold text-[var(--charcoal)]">
+            <span style={{ padding: "4px 12px", background: "#26201d", border: "1px solid rgba(255,255,255,0.09)", borderRadius: "999px", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
               {getMoodLabel(mood, isSurprise)}
             </span>
-            <span className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white px-3 py-1 font-semibold text-[var(--charcoal)]">
-              {languageFlag(language)}
-            </span>
-              {reason && !loading && (
-              <span className="text-[rgba(29,23,19,0.65)]">Pourquoi ces choix: {reason}</span>
+            {reason && !loading && (
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.38)", lineHeight: 1.4 }}>
+                — {reason}
+              </span>
             )}
           </div>
         </motion.header>
 
+        {/* ── History panel ── */}
         <AnimatePresence>
           {showHistory && (
             <motion.section
-              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-              animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-              className="overflow-hidden"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ overflow: "hidden" }}
             >
-              <div className="rounded-[20px] border border-[rgba(15,15,16,0.14)] bg-[rgba(255,255,255,0.9)] p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="font-semibold text-[var(--charcoal)]">Recemment regardees</p>
-                  <p className="text-xs text-[rgba(29,23,19,0.6)]">Expire apres 7 jours</p>
+              <div style={{ background: "#1c1917", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <p style={{ fontWeight: 600, color: "white", margin: 0, fontSize: "14px" }}>Récemment regardées</p>
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", margin: 0 }}>Expire après 7 jours</p>
                 </div>
-
                 {history.length === 0 ? (
-                  <p className="text-sm text-[rgba(29,23,19,0.65)]">Aucune video regardee cette semaine.</p>
+                  <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)", margin: 0 }}>Aucune vidéo regardée cette semaine.</p>
                 ) : (
-                  <div className="flex gap-3 overflow-x-auto pb-1">
-                    {history.slice(0, 8).map((v) => (
-                      <a
-                        key={v.id}
-                        href={`https://youtube.com/watch?v=${v.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-[112px] shrink-0"
-                      >
-                        <img
-                          src={v.thumbnail}
-                          alt={v.title}
-                          className="w-full rounded-lg border border-[rgba(15,15,16,0.12)]"
-                          style={{ aspectRatio: "16/9", objectFit: "cover" }}
-                        />
-                        <span className="mt-1 block line-clamp-2 text-xs text-[rgba(29,23,19,0.7)]">
+                  <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+                    {history.slice(0, 8).map(v => (
+                      <a key={v.id} href={`https://youtube.com/watch?v=${v.id}`} target="_blank" rel="noopener noreferrer"
+                        style={{ width: 110, flexShrink: 0, textDecoration: "none" }}>
+                        <img src={v.thumbnail} alt={v.title}
+                          style={{ width: "100%", borderRadius: 8, aspectRatio: "16/9", objectFit: "cover", border: "1px solid rgba(255,255,255,0.08)" }} />
+                        <span style={{ display: "block", marginTop: 4, fontSize: "11px", color: "rgba(255,255,255,0.5)", lineHeight: 1.35 }} className="line-clamp-2">
                           {v.title}
                         </span>
                       </a>
@@ -478,46 +501,43 @@ export default function ResultsClient() {
           )}
         </AnimatePresence>
 
+        {/* ── Tip ── */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.3 }}
-          className="mb-4 rounded-xl border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.86)] px-4 py-2.5 text-xs text-[rgba(29,23,19,0.72)] flex items-center gap-2"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: "#1c1917", border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: "12px", padding: "10px 14px",
+            fontSize: "12px", color: "rgba(255,255,255,0.4)",
+          }}
         >
-          <MousePointer2 size={14} />
-          Clique pour lire, glisse une carte a gauche pour passer, utilise l'icone interdiction pour masquer une chaine.
+          <MousePointer2 size={13} style={{ flexShrink: 0 }} />
+          Clique pour lire · Glisse à gauche pour passer · 🚫 pour masquer une chaîne
         </motion.div>
 
+        {/* ── Content ── */}
         {loading ? (
           <LoadingSkeleton />
         ) : error ? (
-          <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
-            <p className="font-serif font-semibold text-3xl text-[var(--wine)]">Une erreur est survenue</p>
-            <p className="mt-2 text-sm text-[rgba(29,23,19,0.72)]">{error}</p>
-            <button
-              onClick={() => fetchVideos()}
-              className="yt-button mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
-            >
-              <RefreshCw size={15} /> Reessayer
+          <div style={{ background: "#1c1917", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "18px", padding: "48px 24px", textAlign: "center" }}>
+            <p style={{ fontWeight: 700, fontSize: "22px", color: "#f87171", margin: "0 0 8px" }}>Une erreur est survenue</p>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", margin: "0 0 24px" }}>{error}</p>
+            <button onClick={() => fetchVideos()} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 22px", background: "#ef4444", border: "none", borderRadius: "12px", color: "white", fontWeight: 600, fontSize: "14px", cursor: "pointer" }}>
+              <RefreshCw size={14} /> Réessayer
             </button>
-          </section>
+          </div>
         ) : videos.length === 0 ? (
-          <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
-            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour ce contexte</p>
-            <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">
-              Essaie le mode surprise pour explorer d'autres pistes.
-            </p>
-            <button
-              onClick={handleSurprise}
-              className="yt-button mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--wine)] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(255,0,51,0.24)]"
-            >
-              <Shuffle size={15} /> Mode surprise
+          <div style={{ background: "#1c1917", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "18px", padding: "48px 24px", textAlign: "center" }}>
+            <p style={{ fontWeight: 700, fontSize: "20px", color: "white", margin: "0 0 8px" }}>Aucun résultat pour ce contexte</p>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Essaie le mode surprise pour explorer d'autres pistes.</p>
+            <button onClick={handleSurprise} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 22px", background: "#ef4444", border: "none", borderRadius: "12px", color: "white", fontWeight: 600, fontSize: "14px", cursor: "pointer" }}>
+              <Shuffle size={14} /> Mode surprise
             </button>
-          </section>
+          </div>
         ) : (
           <motion.section layout className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             <AnimatePresence mode="popLayout">
-              {videos.map((video) => (
+              {videos.map(video => (
                 <VideoCard
                   key={video.id}
                   video={video}
