@@ -9,7 +9,7 @@ import {
   Clock3,
   Globe,
   MessageSquareText,
-  Play,
+  Sparkles,
   Shuffle,
   Youtube,
 } from "lucide-react";
@@ -20,24 +20,24 @@ type Language = "fr" | "en" | "any";
 const STEP_ORDER: Step[] = ["welcome", "duration", "context", "language"];
 
 const DURATIONS = [
-  { label: "15 min", value: 15, note: "Rapide" },
-  { label: "30 min", value: 30, note: "Standard" },
-  { label: "1h+", value: 65, note: "Pose longue" },
+  { label: "15 min", value: 15, note: "Rapide", expected: "2-4 videos" },
+  { label: "30 min", value: 30, note: "Standard", expected: "4-7 videos" },
+  { label: "1h+", value: 65, note: "Pose longue", expected: "8+ videos" },
 ];
 
 const CONTEXT_PRESETS = [
-  { label: "Drôle", value: "funny comedy entertainment humor" },
-  { label: "Détente", value: "relaxing calm lofi ambient chill" },
+  { label: "Drole", value: "funny comedy entertainment humor" },
+  { label: "Detente", value: "relaxing calm lofi ambient chill" },
   { label: "Docu", value: "documentary educational interesting" },
   { label: "Gaming", value: "gaming gameplay commentary highlights" },
-  { label: "Cinéma", value: "movie review cinema analysis" },
+  { label: "Cinema", value: "movie review cinema analysis" },
   { label: "Musique", value: "live session music performance" },
   { label: "Science", value: "science technology innovation explained" },
   { label: "Surprise", value: "interesting popular trending high quality" },
 ];
 
 const LANGUAGES: { label: string; value: Language; icon: string }[] = [
-  { label: "Français", value: "fr", icon: "🇫🇷" },
+  { label: "Francais", value: "fr", icon: "🇫🇷" },
   { label: "English", value: "en", icon: "🇬🇧" },
   { label: "Peu importe", value: "any", icon: "🌐" },
 ];
@@ -187,15 +187,22 @@ export default function Home() {
         <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
           <section className="bistro-card relative overflow-hidden rounded-[30px] p-7 md:p-10">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.35)] to-transparent" />
-            {step !== "welcome" && <div className="mb-6"><StepProgress current={step} /></div>}
+            {step !== "welcome" && (
+              <div className="mb-6">
+                <StepProgress current={step} />
+              </div>
+            )}
 
             <AnimatePresence custom={direction} mode="wait">
               {step === "welcome" && (
                 <motion.div key="welcome" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                  <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#ff8da0]">Clair et immédiat</p>
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--yt-border)] bg-[rgba(25,27,30,0.9)] px-3 py-1.5">
+                    <Sparkles size={13} className="text-[#ff8da0]" />
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff8da0]">Clair et immediat</p>
+                  </div>
                   <SplitTitle text="T'en as marre de scroller sans savoir quoi lancer ?" />
                   <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[var(--yt-muted)] md:text-base">
-                    3 étapes rapides. Tu donnes ton timing, ton contexte et ta langue. On te propose directement des vidéos regardables.
+                    3 etapes rapides. Tu donnes ton timing, ton contexte et ta langue. On te propose directement des videos regardables.
                   </p>
 
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -224,7 +231,7 @@ export default function Home() {
               {step === "duration" && (
                 <motion.div key="duration" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Combien de temps tu as ?</h2>
-                  <p className="mt-2 text-[var(--yt-muted)]">On calibre la durée des vidéos sur ton vrai timing.</p>
+                  <p className="mt-2 text-[var(--yt-muted)]">On calibre la duree des videos sur ton vrai timing.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {DURATIONS.map((item, index) => (
                       <motion.button
@@ -239,11 +246,11 @@ export default function Home() {
                           toStep("context");
                           window.setTimeout(() => contextRef.current?.focus(), 360);
                         }}
-                        className="yt-button yt-card rounded-2xl p-4 text-left"
+                        className="yt-button yt-card focus-halo rounded-2xl p-4 text-left"
                       >
                         <p className="text-xs uppercase tracking-[0.16em] text-[#ff92a5]">{item.note}</p>
                         <p className="mt-2 font-serif text-3xl font-semibold text-[var(--yt-text)]">{item.label}</p>
-                        <p className="mt-1 text-xs text-[var(--yt-muted)]">Session optimisée</p>
+                        <p className="mt-1 text-xs text-[var(--yt-muted)]">{item.expected}</p>
                       </motion.button>
                     ))}
                   </div>
@@ -255,8 +262,8 @@ export default function Home() {
 
               {step === "context" && (
                 <motion.div key="context" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Décris ce que t'as envie de regarder</h2>
-                  <p className="mt-2 text-[var(--yt-muted)]">Tu peux écrire naturellement. Le texte libre est prioritaire.</p>
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Decris ce que t'as envie de regarder</h2>
+                  <p className="mt-2 text-[var(--yt-muted)]">Tu peux ecrire naturellement. Le texte libre est prioritaire.</p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
                     <label htmlFor="watch-context" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--yt-text)]">
@@ -276,7 +283,7 @@ export default function Home() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && contextText.trim()) toStep("language");
                         }}
-                        placeholder="Décris exactement ce que tu veux regarder..."
+                        placeholder="Decris exactement ce que tu veux regarder..."
                         className="yt-input w-full rounded-2xl px-4 py-4 pr-32 text-sm outline-none"
                       />
                       <button
@@ -304,7 +311,7 @@ export default function Home() {
                           setContextText("");
                           toStep("language");
                         }}
-                        className="yt-button rounded-xl border px-3 py-3 text-center text-sm"
+                        className="yt-button focus-halo rounded-xl border px-3 py-3 text-center text-sm"
                         style={{
                           borderColor: contextPreset === item.value && !contextText ? "rgba(255, 39, 72, 0.48)" : "var(--yt-border)",
                           background: contextPreset === item.value && !contextText ? "rgba(255, 39, 72, 0.16)" : "rgba(29, 31, 34, 0.9)",
@@ -323,8 +330,8 @@ export default function Home() {
 
               {step === "language" && (
                 <motion.div key="language" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Quelle langue préférée ?</h2>
-                  <p className="mt-2 text-[var(--yt-muted)]">Dernière étape, puis on lance les recommandations.</p>
+                  <h2 className="font-serif text-[clamp(1.9rem,5vw,3rem)] font-semibold text-[var(--yt-text)]">Quelle langue preferee ?</h2>
+                  <p className="mt-2 text-[var(--yt-muted)]">Derniere etape, puis on lance les recommandations.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {LANGUAGES.map((item, index) => (
                       <motion.button
@@ -335,10 +342,11 @@ export default function Home() {
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => launch(item.value)}
-                        className="yt-button yt-card rounded-2xl p-5 text-center"
+                        className="yt-button yt-card focus-halo rounded-2xl p-5 text-center"
                       >
                         <p className="text-4xl">{item.icon}</p>
                         <p className="mt-3 font-serif text-2xl font-semibold text-[var(--yt-text)]">{item.label}</p>
+                        <p className="mt-1 text-xs text-[var(--yt-muted)]">Lancer maintenant</p>
                       </motion.button>
                     ))}
                   </div>
@@ -351,10 +359,10 @@ export default function Home() {
           </section>
 
           <aside className="bistro-card h-fit rounded-[30px] p-6 md:p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff95a8]">Comment ça marche</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff95a8]">Comment ca marche</p>
             <div className="mt-4 space-y-3">
               {[
-                { icon: Clock3, title: "1. Durée", text: "15 min, 30 min ou 1h+." },
+                { icon: Clock3, title: "1. Duree", text: "15 min, 30 min ou 1h+." },
                 { icon: MessageSquareText, title: "2. Contexte", text: "Texte libre ou preset rapide." },
                 { icon: Globe, title: "3. Langue", text: "FR, EN ou peu importe." },
               ].map((item) => (
@@ -375,7 +383,15 @@ export default function Home() {
             </div>
 
             <div className="mt-5 rounded-2xl border border-[var(--yt-border)] bg-[rgba(20,22,25,0.9)] p-4">
-              <p className="text-sm font-semibold text-[var(--yt-text)]">Résultat attendu</p>
+              <p className="text-sm font-semibold text-[var(--yt-text)]">Briefing en direct</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[var(--yt-border)] bg-[rgba(28,30,33,0.92)] px-2.5 py-1 text-[11px] text-[var(--yt-text)]">
+                  {duration ? `${duration} min` : "temps a definir"}
+                </span>
+                <span className="rounded-full border border-[var(--yt-border)] bg-[rgba(28,30,33,0.92)] px-2.5 py-1 text-[11px] text-[var(--yt-text)]">
+                  {contextText.trim() ? "texte libre" : contextPreset ? "preset selectionne" : "contexte a definir"}
+                </span>
+              </div>
               <p className="mt-1 text-xs text-[var(--yt-muted)]">Des recommandations claires, directement regardables, sans perte de temps.</p>
             </div>
           </aside>
