@@ -15,8 +15,8 @@ import {
 
 const DURATIONS = [
   { label: "15 min", value: 15, note: "Rapide", icon: "⚡" },
-  { label: "30 min", value: 30, note: "Standard", icon: "🍽️" },
-  { label: "1h+", value: 65, note: "Detendu", icon: "🕰️" },
+  { label: "30 min", value: 30, note: "Standard", icon: "⏱️" },
+  { label: "1h+", value: 65, note: "Pose longue", icon: "🕰️" },
 ];
 
 const MOODS = [
@@ -87,7 +87,7 @@ function SplitTitle({ text }: { text: string }) {
 function StepProgress({ current }: { current: Step }) {
   const labels = [
     { step: "duration", label: "Temps" },
-    { step: "mood", label: "Envie" },
+    { step: "mood", label: "Contexte" },
     { step: "language", label: "Langue" },
   ] as const;
 
@@ -198,11 +198,11 @@ export default function Home() {
               {step === "welcome" && (
                 <motion.div key="welcome" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    Rapide et efficace
+                    Direct et utile
                   </p>
-                  <SplitTitle text="Marre de scroller avant chaque repas ?" />
+                  <SplitTitle text="T'en as marre de scroller sans savoir quoi lancer ?" />
                   <p className="mt-6 max-w-xl text-[15px] md:text-base text-[rgba(21,32,51,0.76)] leading-relaxed">
-                    Reponds a 3 questions et lance directement une video adaptee a ton timing.
+                    En quelques secondes, tu donnes ton temps, ton contexte, ta langue et tu regardes.
                   </p>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -231,7 +231,7 @@ export default function Home() {
               {step === "duration" && (
                 <motion.div key="duration" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Combien de temps tu as ?</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">On aligne la duree des videos avec ton repas.</p>
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">On calibre la duree des videos sur ton temps reel.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {DURATIONS.map((item, index) => (
                       <motion.button
@@ -262,11 +262,11 @@ export default function Home() {
               {step === "mood" && (
                 <motion.div key="mood" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Decris ce que t'as envie de regarder</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Un court texte suffit pour guider les recos.</p>
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Le texte libre est prioritaire: ecris comme tu veux, meme en une phrase naturelle.</p>
 
                   <div className="yt-input-wrap mt-5 rounded-3xl p-5">
-                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]">Description libre</label>
-                    <p className="mt-1 text-sm text-[rgba(21,32,51,0.62)]">Ex: "quelque chose de captivant, pas trop bruyant, environ 25 min"</p>
+                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]">Ton texte libre</label>
+                    <p className="mt-1 text-sm text-[rgba(21,32,51,0.62)]">Ex: "quelque chose de captivant, pas trop bruyant, autour de 25 min"</p>
                     <div className="mt-3 relative">
                       <input
                         id="custom-mood"
@@ -280,7 +280,7 @@ export default function Home() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && customMood.trim()) toStep("language");
                         }}
-                        placeholder="Ecris ton besoin ici..."
+                        placeholder="Decris exactement ce que tu veux regarder..."
                         className="yt-input w-full rounded-2xl px-4 py-4 pr-32 text-sm outline-none"
                       />
                       <button
@@ -295,7 +295,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(21,32,51,0.56)]">Ou choisis une idee rapide</p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(21,32,51,0.56)]">Ou utilise un raccourci</p>
                   <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     {MOODS.map((item, index) => (
                       <motion.button
@@ -331,7 +331,7 @@ export default function Home() {
               {step === "language" && (
                 <motion.div key="language" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
                   <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Quelle langue preferee ?</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Derniere etape, puis on lance la selection.</p>
+                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Derniere etape, puis on lance les videos.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {LANGUAGES.map((item, index) => (
                       <motion.button
@@ -358,25 +358,37 @@ export default function Home() {
           </section>
 
           <aside className="bistro-card rounded-[30px] p-6 md:p-7 h-fit">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Comment ca marche</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Ton briefing</p>
             <div className="mt-4 space-y-3">
               {[
-                { icon: Clock3, title: "1. Choisis ton temps", text: "15 min, 30 min ou plus." },
-                { icon: MessageSquareText, title: "2. Decris ton envie", text: "Libre ou via un preset rapide." },
-                { icon: Languages, title: "3. Choisis la langue", text: "Puis on lance les recommandations." },
+                { icon: Clock3, title: "Temps", text: duration ? `${duration} min` : "A definir" },
+                {
+                  icon: MessageSquareText,
+                  title: "Contexte",
+                  text: customMood.trim() || (mood ? "Preset selectionne" : "Texte libre ou preset"),
+                },
+                {
+                  icon: Languages,
+                  title: "Langue",
+                  text: step === "language" ? "Choisis maintenant" : "FR, EN ou peu importe",
+                },
               ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4 flex gap-3">
+                <motion.div
+                  key={item.title}
+                  whileHover={{ y: -2 }}
+                  className="rounded-xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4 flex gap-3"
+                >
                   <item.icon size={16} className="text-[var(--wine)] mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-[var(--charcoal)]">{item.title}</p>
                     <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">{item.text}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
             <div className="mt-5 rounded-2xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4">
-              <p className="text-sm font-semibold text-[var(--charcoal)]">Objectif</p>
-              <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">Trouver vite une video qui colle vraiment a ton repas.</p>
+              <p className="text-sm font-semibold text-[var(--charcoal)]">Resultat attendu</p>
+              <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">Des videos directement regardables, sans perte de temps.</p>
             </div>
           </aside>
         </div>

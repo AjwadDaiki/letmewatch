@@ -12,7 +12,7 @@ function LoadingFallback() {
             style={{ animation: `float-soft 1s ease-in-out ${i * 0.12}s infinite` }}
           />
         ))}
-        <span>Le concierge prepare ta selection...</span>
+        <span>Preparation de ta selection...</span>
       </div>
     </div>
   );

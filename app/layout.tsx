@@ -15,24 +15,24 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmeeat.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmewatch.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Find the Perfect YouTube Video to Watch While Eating | LetMeWatch",
+    default: "Find the Right YouTube Video Fast | LetMeWatch",
     template: "%s | LetMeWatch",
   },
   description:
-    "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds. AI-powered, no account needed.",
+    "Stop scrolling. Tell us what you want to watch and how much time you have - we find the right YouTube video in seconds.",
   keywords: [
-    "what to watch while eating",
-    "videos to watch while eating",
-    "youtube videos while eating",
-    "what to watch during lunch",
-    "youtube while eating alone",
-    "quoi regarder en mangeant",
-    "que ver en youtube mientras como",
+    "what to watch on youtube",
+    "youtube recommendations",
+    "what to watch now",
+    "video recommendation app",
+    "find a youtube video quickly",
+    "quoi regarder sur youtube",
+    "que ver en youtube ahora",
   ],
   authors: [{ name: "LetMeWatch" }],
   creator: "LetMeWatch",
@@ -40,23 +40,23 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "LetMeWatch",
-    title: "Find the Perfect YouTube Video to Watch While Eating",
+    title: "Find the Right YouTube Video Fast",
     description:
-      "Stop scrolling. Tell us your mood and how long you're eating - we find the perfect YouTube video in seconds.",
+      "Stop scrolling. Tell us what you want to watch and how much time you have - we find the right YouTube video in seconds.",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "LetMeWatch - Smart video picks for your meal",
+        alt: "LetMeWatch - Smart video picks for your watch session",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Find the Perfect YouTube Video to Watch While Eating",
+    title: "Find the Right YouTube Video Fast",
     description:
-      "Stop scrolling. AI picks the perfect YouTube video for your meal in 10 seconds.",
+      "Stop scrolling. AI picks the right YouTube video for your current session in seconds.",
     images: ["/opengraph-image"],
   },
   robots: {
@@ -90,7 +90,7 @@ const schemaOrg = {
       name: "LetMeWatch",
       url: SITE_URL,
       description:
-        "AI-powered YouTube video recommendations for mealtime. Tell us your mood and meal duration - get the perfect video in seconds.",
+        "AI-powered YouTube recommendations. Set your context, available time, and language to get instantly watchable videos.",
       applicationCategory: "EntertainmentApplication",
       operatingSystem: "Any",
       offers: {
@@ -111,10 +111,10 @@ const schemaOrg = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "What should I watch while eating?",
+          name: "What should I watch on YouTube right now?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "LetMeWatch uses AI to find the perfect YouTube video for your meal. Just tell us your mood, how long you're eating, and your language preference - you get 3 perfectly matched videos in seconds.",
+            text: "LetMeWatch uses AI to find the right YouTube video for your current context. Just set your available time, what you want to watch, and your language preference.",
           },
         },
         {
@@ -122,7 +122,7 @@ const schemaOrg = {
           name: "How does LetMeWatch work?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Answer 3 quick questions (meal duration, mood, language). Our AI generates optimized YouTube search queries and returns the best videos matched to your context. No account needed, no scrolling.",
+            text: "Answer 3 quick questions (duration, context, language). Our AI generates optimized YouTube search queries and returns the best videos matched to your input.",
           },
         },
         {

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "LetMeWatch - Smart video picks for your meal";
+export const alt = "LetMeWatch - Smart video picks for your watch session";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -69,7 +69,7 @@ export default function OGImage() {
           alignItems: "stretch",
           justifyContent: "space-between",
           background:
-            "radial-gradient(circle at 18% 12%, rgba(255,0,51,0.1), transparent 38%), radial-gradient(circle at 88% 88%, rgba(15,15,16,0.08), transparent 42%), linear-gradient(180deg, #eceef2, #dde1e8)",
+            "radial-gradient(circle at 12% 9%, rgba(84,110,147,0.16), transparent 42%), radial-gradient(circle at 90% 90%, rgba(84,110,147,0.1), transparent 42%), linear-gradient(180deg, #edf1f6, #dde4ee)",
           fontFamily: "system-ui, sans-serif",
           color: "#19191b",
           padding: "44px 48px",
@@ -77,17 +77,6 @@ export default function OGImage() {
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(90deg, rgba(15,15,16,0.035) 1px, transparent 1px), linear-gradient(180deg, rgba(15,15,16,0.03) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            opacity: 0.25,
-          }}
-        />
-
         <div
           style={{
             width: "58%",
@@ -113,7 +102,7 @@ export default function OGImage() {
                   fontWeight: 700,
                 }}
               >
-                Video picks that fit your meal
+                Video picks that fit your time
               </div>
             </div>
           </div>
@@ -132,8 +121,8 @@ export default function OGImage() {
                 maxWidth: 620,
               }}
             >
-              Tell us your time, your vibe, your language. Get watchable YouTube
-              recommendations in seconds.
+              Tell us your time, your context, your language. Get watchable
+              YouTube recommendations in seconds.
             </div>
           </div>
 

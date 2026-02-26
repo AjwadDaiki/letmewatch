@@ -33,11 +33,11 @@ export async function getYouTubeQueries(
       : "any language";
 
   const systemPrompt = req.isSurprise
-    ? `You are a YouTube content discovery expert. Generate 2-3 YouTube search queries for a genuinely surprising, niche, high-quality video that someone would never think to search for but would love while eating. Think: unusual documentaries, obscure crafts, fascinating science, street food from a specific country, weird history, etc. Return ONLY valid JSON.`
-    : `You are a YouTube search query expert. Given a user's meal context, generate 2-3 optimized YouTube search queries for perfect watch-while-eating content. The queries should be specific enough to find quality content but not too restrictive. Return ONLY valid JSON.`;
+    ? `You are a YouTube content discovery expert. Generate 2-3 YouTube search queries for a genuinely surprising, niche, high-quality video that someone would not think to search for but would enjoy right now. Think: unusual documentaries, obscure crafts, fascinating science, weird history, unique stories. Return ONLY valid JSON.`
+    : `You are a YouTube search query expert. Given a user's watch context, generate 2-3 optimized YouTube search queries for highly relevant content. The queries should be specific enough to find quality content but not too restrictive. Return ONLY valid JSON.`;
 
   const userPrompt = req.isSurprise
-    ? `Generate a surprising YouTube recommendation for someone eating for ${req.duration} minutes.
+    ? `Generate a surprising YouTube recommendation for someone watching for ${req.duration} minutes.
 Language: ${languageHint}
 Recently watched IDs (avoid): ${historyText}
 

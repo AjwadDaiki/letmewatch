@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LANG_CONFIG, LANG_CODES } from "@/lib/langConfig";
 import { MOOD_CONFIG, MOOD_SLUGS } from "@/lib/moodConfig";
@@ -17,7 +17,7 @@ export async function generateMetadata({
   const config = LANG_CONFIG[code];
   if (!config) return {};
 
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmeeat.vercel.app";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmewatch.vercel.app";
 
   return {
     title: config.title,
@@ -49,247 +49,87 @@ export default async function LangPage({
   const ctaUrl = `/results?mood=interesting+popular+trending&duration=30&language=${code}&surprise=false`;
 
   return (
-    <main style={{ background: "#1A1A2E", minHeight: "100vh", color: "white" }}>
-      {/* Ambient blobs */}
-      <div
-        style={{
-          position: "fixed",
-          top: "-15%",
-          left: "-10%",
-          width: 600,
-          height: 600,
-          borderRadius: "50%",
-          background: "#6C63FF",
-          opacity: 0.07,
-          filter: "blur(120px)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          bottom: "-20%",
-          right: "-10%",
-          width: 500,
-          height: 500,
-          borderRadius: "50%",
-          background: "#FF6584",
-          opacity: 0.07,
-          filter: "blur(100px)",
-          pointerEvents: "none",
-        }}
-      />
-
-      <div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "48px 24px 80px",
-          position: "relative",
-        }}
-      >
-        {/* Back link */}
+    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto max-w-5xl">
         <Link
           href="/"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            color: "#8892A4",
-            textDecoration: "none",
-            fontSize: 14,
-            marginBottom: 40,
-          }}
+          className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--wine)]"
         >
-          ← LetMeEat
+          ← LetMeWatch
         </Link>
 
-        {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <div style={{ fontSize: 80, marginBottom: 16 }}>{config.flag}</div>
+        <section className="bistro-card rounded-[28px] p-7 md:p-10">
+          <div className="text-center">
+            <p className="text-6xl md:text-7xl">{config.flag}</p>
+            <h1 className="mt-4 font-serif text-[clamp(2rem,5vw,3.2rem)] font-semibold text-[var(--charcoal)]">
+              {config.h1}
+            </h1>
+            <p className="mx-auto mt-3 max-w-2xl text-[15px] md:text-base text-[rgba(21,32,51,0.72)]">
+              {config.subheading}
+            </p>
 
-          <h1
-            style={{
-              fontSize: "clamp(26px, 5vw, 42px)",
-              fontWeight: 900,
-              lineHeight: 1.2,
-              letterSpacing: "-1px",
-              marginBottom: 16,
-              color: "white",
-            }}
-          >
-            {config.h1}
-          </h1>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+              {[15, 30, 65].map((value) => (
+                <Link
+                  key={value}
+                  href={`/results?mood=interesting+popular+trending&duration=${value}&language=${code}&surprise=false`}
+                  className="yt-button rounded-xl border border-[rgba(21,32,51,0.14)] bg-white px-4 py-2 text-sm font-semibold text-[var(--charcoal)]"
+                >
+                  {value === 65 ? "1h+" : `${value} min`}
+                </Link>
+              ))}
+            </div>
 
-          <p
-            style={{
-              fontSize: 18,
-              color: "#A0AEC0",
-              lineHeight: 1.6,
-              marginBottom: 36,
-              maxWidth: 560,
-              margin: "0 auto 36px",
-            }}
-          >
-            {config.subheading}
-          </p>
-
-          {/* Duration links */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 12,
-              marginBottom: 28,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { label: "15 min", value: 15 },
-              { label: "30 min", value: 30 },
-              { label: "1h+", value: 65 },
-            ].map((d) => (
-              <Link
-                key={d.value}
-                href={`/results?mood=interesting+popular+trending&duration=${d.value}&language=${code}&surprise=false`}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(108,99,255,0.3)",
-                  color: "#A0AEC0",
-                  textDecoration: "none",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  background: "rgba(108,99,255,0.08)",
-                }}
-              >
-                {d.label}
-              </Link>
-            ))}
+            <Link
+              href={ctaUrl}
+              className="yt-button mt-6 inline-flex items-center gap-2 rounded-2xl bg-[var(--wine)] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(255,47,79,0.24)] md:text-base"
+            >
+              {config.cta}
+            </Link>
           </div>
+        </section>
 
-          <Link
-            href={ctaUrl}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "16px 36px",
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #6C63FF, #7C73FF)",
-              color: "white",
-              fontWeight: 700,
-              fontSize: 18,
-              textDecoration: "none",
-              boxShadow: "0 0 30px rgba(108,99,255,0.35)",
-            }}
-          >
-            {config.cta}
-          </Link>
-        </div>
-
-        {/* Browse by mood in this language */}
-        <section style={{ marginBottom: 56 }}>
-          <h2
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#6C63FF",
-              marginBottom: 20,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Browse by mood — in {config.label}
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-              gap: 12,
-            }}
-          >
+        <section className="mt-5 bistro-card rounded-[28px] p-6 md:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--wine)]">
+            Categories
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
             {MOOD_SLUGS.map((slug) => {
               const mood = MOOD_CONFIG[slug];
               return (
                 <Link
                   key={slug}
                   href={`/results?mood=${encodeURIComponent(mood.moodValue)}&duration=30&language=${code}&surprise=false`}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "16px 12px",
-                    borderRadius: 14,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    textDecoration: "none",
-                    color: "#A0AEC0",
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
+                  className="yt-button rounded-xl border border-[rgba(21,32,51,0.12)] bg-white/80 px-3 py-3 text-center"
                 >
-                  <span style={{ fontSize: 28 }}>{mood.emoji}</span>
-                  <span>{mood.label}</span>
+                  <span className="block text-xl">{mood.emoji}</span>
+                  <span className="mt-1 block text-xs font-semibold text-[var(--charcoal)]">{mood.label}</span>
                 </Link>
               );
             })}
           </div>
         </section>
 
-        {/* Other languages */}
-        <section>
-          <h2
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#6C63FF",
-              marginBottom: 16,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
+        <section className="mt-5 bistro-card rounded-[28px] p-6 md:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--wine)]">
             Other languages
-          </h2>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2.5">
             <Link
               href="/"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "10px 18px",
-                borderRadius: 12,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "#8892A4",
-                textDecoration: "none",
-                fontSize: 14,
-              }}
+              className="yt-button rounded-xl border border-[rgba(21,32,51,0.14)] bg-white px-4 py-2 text-sm font-semibold text-[var(--charcoal)]"
             >
               🇬🇧 English
             </Link>
             {LANG_CODES.filter((c) => c !== code).map((c) => {
-              const l = LANG_CONFIG[c];
+              const lang = LANG_CONFIG[c];
               return (
                 <Link
                   key={c}
                   href={`/lang/${c}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "10px 18px",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "#8892A4",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
+                  className="yt-button rounded-xl border border-[rgba(21,32,51,0.14)] bg-white px-4 py-2 text-sm font-semibold text-[var(--charcoal)]"
                 >
-                  {l.flag} {l.label}
+                  {lang.flag} {lang.label}
                 </Link>
               );
             })}

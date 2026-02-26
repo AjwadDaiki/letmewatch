@@ -38,7 +38,7 @@ function formatDuration(seconds: number): string {
 
 function getMoodLabel(mood: string, isSurprise: boolean): string {
   if (isSurprise) return "Surprise";
-  const first = mood.split(" ")[0] || "ambiance";
+  const first = mood.split(" ")[0] || "contexte";
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
 
@@ -428,7 +428,7 @@ export default function ResultsClient() {
             <span className="rounded-full border border-[rgba(15,15,16,0.14)] bg-white px-3 py-1 font-semibold text-[var(--charcoal)]">
               {languageFlag(language)}
             </span>
-            {reason && !loading && (
+              {reason && !loading && (
               <span className="text-[rgba(29,23,19,0.65)]">Pourquoi ces choix: {reason}</span>
             )}
           </div>
@@ -485,8 +485,7 @@ export default function ResultsClient() {
           className="mb-4 rounded-xl border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.86)] px-4 py-2.5 text-xs text-[rgba(29,23,19,0.72)] flex items-center gap-2"
         >
           <MousePointer2 size={14} />
-          Clique pour lire, glisse une carte a gauche pour passer, utilise l'icone interdiction
-          pour masquer une chaine.
+          Clique pour lire, glisse une carte a gauche pour passer, utilise l'icone interdiction pour masquer une chaine.
         </motion.div>
 
         {loading ? (
@@ -504,7 +503,7 @@ export default function ResultsClient() {
           </section>
         ) : videos.length === 0 ? (
           <section className="rounded-[22px] border border-[rgba(15,15,16,0.12)] bg-[rgba(255,255,255,0.9)] p-10 text-center">
-            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour cette ambiance</p>
+            <p className="font-serif font-semibold text-3xl text-[var(--charcoal)]">Aucun resultat pour ce contexte</p>
             <p className="mt-2 text-sm text-[rgba(29,23,19,0.7)]">
               Essaie le mode surprise pour explorer d'autres pistes.
             </p>
