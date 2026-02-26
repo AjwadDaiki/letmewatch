@@ -204,7 +204,7 @@ export default function Home() {
                 className="flex flex-col items-center justify-center"
               >
                 <div className="relative mb-8">
-                  <div className="animate-float flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-[#FF0000] to-[#CC0000] shadow-2xl shadow-red-500/35">
+                  <div className="animate-float flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-[#FF0000] to-[#CC0000] shadow-lg shadow-red-500/18">
                     <div className="relative">
                       <Youtube className="h-14 w-14 text-white" />
                       <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white">
@@ -212,7 +212,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="absolute inset-0 -z-10 rounded-3xl bg-[#FF0000] opacity-25 blur-3xl" />
+                  <div className="absolute inset-0 -z-10 rounded-3xl bg-[#FF0000] opacity-10 blur-2xl" />
                 </div>
 
                 <h1 className="text-center text-5xl font-bold sm:text-6xl">
@@ -550,7 +550,7 @@ export default function Home() {
                         <Youtube className="h-8 w-8 text-white" />
                       </div>
                     </div>
-                    <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-20 blur-2xl" />
+                    <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-10 blur-xl" />
                   </div>
 
                   <p className="mt-8 text-2xl font-bold text-white">
