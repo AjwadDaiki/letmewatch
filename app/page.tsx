@@ -1,134 +1,166 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
+  ArrowRight,
+  Brain,
   ChevronLeft,
-  ChevronRight,
-  Clock3,
-  Globe2,
-  Layers,
+  Clock,
+  Loader2,
   Search,
-  Shuffle,
   Sparkles,
+  Utensils,
   Youtube,
+  Zap,
 } from "lucide-react";
 
-type Step = "welcome" | "duration" | "context" | "language";
-type Language = "fr" | "en" | "any";
+type Step = "welcome" | "time" | "context" | "loading";
+type Direction = "forward" | "backward";
 
-const STEP_ORDER: Step[] = ["welcome", "duration", "context", "language"];
+interface TimeOption {
+  id: string;
+  label: string;
+  minutes: number;
+  emoji: string;
+}
 
-const DURATIONS = [
-  { value: 15, label: "15 min", note: "Rapide" },
-  { value: 30, label: "30 min", note: "Standard" },
-  { value: 65, label: "1h+", note: "Pose longue" },
+interface KeywordOption {
+  id: string;
+  label: string;
+  emoji: string;
+  category: "mood" | "content" | "style";
+  query: string;
+}
+
+const timeOptions: TimeOption[] = [
+  { id: "quick", label: "15 min", minutes: 15, emoji: "⚡" },
+  { id: "normal", label: "30 min", minutes: 30, emoji: "🍽️" },
+  { id: "long", label: "1 heure", minutes: 60, emoji: "🍷" },
+  { id: "relax", label: "1h30", minutes: 90, emoji: "🛋️" },
 ];
 
-const PRESETS = [
-  { label: "Drole", value: "funny comedy entertainment humor" },
-  { label: "Detente", value: "relaxing calm lofi ambient chill" },
-  { label: "Docu", value: "documentary educational interesting" },
-  { label: "Gaming", value: "gaming gameplay commentary highlights" },
-  { label: "Cinema", value: "movie review cinema analysis" },
-  { label: "Musique", value: "live session music performance" },
-  { label: "Science", value: "science technology innovation explained" },
-  { label: "Surprise", value: "interesting popular trending high quality" },
+const keywordOptions: KeywordOption[] = [
+  { id: "lazy", label: "Flemme", emoji: "😴", category: "mood", query: "relaxing chill easy watch" },
+  { id: "tired", label: "Creve", emoji: "😮‍💨", category: "mood", query: "light entertaining low effort" },
+  { id: "happy", label: "Bonne vibe", emoji: "😄", category: "mood", query: "positive upbeat fun" },
+  { id: "stressed", label: "Stresse", emoji: "😵", category: "mood", query: "calm soothing no stress" },
+
+  { id: "funny", label: "Drole", emoji: "😂", category: "content", query: "funny comedy entertainment humor" },
+  { id: "gaming", label: "Gaming", emoji: "🎮", category: "content", query: "gaming gameplay highlights" },
+  { id: "docu", label: "Docu", emoji: "🎬", category: "content", query: "documentary educational interesting" },
+  { id: "music", label: "Musique", emoji: "🎵", category: "content", query: "music live performance session" },
+  { id: "science", label: "Science", emoji: "🔬", category: "content", query: "science technology explained" },
+
+  { id: "short", label: "Court", emoji: "💥", category: "style", query: "short videos quick format" },
+  { id: "story", label: "Story", emoji: "📖", category: "style", query: "storytelling narrative" },
+  { id: "mindblow", label: "Mindblow", emoji: "🤯", category: "style", query: "mind blowing facts discoveries" },
 ];
 
-const LANGUAGES: { label: string; value: Language; icon: string }[] = [
-  { label: "Francais", value: "fr", icon: "🇫🇷" },
-  { label: "English", value: "en", icon: "🇬🇧" },
-  { label: "Peu importe", value: "any", icon: "🌐" },
+const loadingPhases = [
+  { icon: Brain, text: "Analyse de ton contexte..." },
+  { icon: Search, text: "Recherche des meilleures videos..." },
+  { icon: Sparkles, text: "Selection finale en cours..." },
 ];
 
 const panelVariants: Variants = {
-  enter: (direction: number) => ({
+  enter: (direction: Direction) => ({
     opacity: 0,
-    y: 18,
-    x: direction > 0 ? 16 : -16,
-    filter: "blur(4px)",
+    y: 20,
+    x: direction === "forward" ? 26 : -26,
+    filter: "blur(3px)",
   }),
   center: {
     opacity: 1,
     y: 0,
     x: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
   },
-  exit: (direction: number) => ({
+  exit: (direction: Direction) => ({
     opacity: 0,
-    y: -12,
-    x: direction > 0 ? -14 : 14,
-    filter: "blur(3px)",
-    transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+    y: -16,
+    x: direction === "forward" ? -20 : 20,
+    filter: "blur(2px)",
+    transition: { duration: 0.24, ease: [0.4, 0, 1, 1] },
   }),
 };
 
-function StepRail({ current }: { current: Step }) {
-  const steps = [
-    { key: "duration", label: "Temps" },
-    { key: "context", label: "Contexte" },
-    { key: "language", label: "Langue" },
-  ] as const;
-  const currentIndex = Math.max(0, steps.findIndex((item) => item.key === current));
-
-  return (
-    <div className="flex items-center gap-3">
-      {steps.map((item, idx) => {
-        const active = idx <= currentIndex;
-        return (
-          <div key={item.key} className="flex items-center gap-2">
-            <motion.div
-              layout
-              className="h-1.5 rounded-full"
-              animate={{
-                width: idx === currentIndex ? 42 : 16,
-                backgroundColor: active ? "var(--yt-red)" : "rgba(255,255,255,0.16)",
-              }}
-            />
-            <span className="text-[10px] uppercase tracking-[0.16em]" style={{ color: active ? "#ffd8df" : "var(--yt-muted)" }}>
-              {item.label}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function Home() {
   const router = useRouter();
+
   const [step, setStep] = useState<Step>("welcome");
-  const [direction, setDirection] = useState(1);
-  const [duration, setDuration] = useState<number | null>(null);
+  const [direction, setDirection] = useState<Direction>("forward");
+  const [selectedTime, setSelectedTime] = useState<TimeOption | null>(null);
   const [contextText, setContextText] = useState("");
-  const [preset, setPreset] = useState<string | null>(null);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [loadingIndex, setLoadingIndex] = useState(0);
   const [navigating, setNavigating] = useState(false);
 
-  const stepIndex = useMemo(() => STEP_ORDER.indexOf(step), [step]);
+  const canSearch = useMemo(
+    () => contextText.trim().length > 0 || selectedKeywords.length > 0,
+    [contextText, selectedKeywords]
+  );
 
-  const toStep = (next: Step) => {
-    const nextIndex = STEP_ORDER.indexOf(next);
-    setDirection(nextIndex >= stepIndex ? 1 : -1);
+  const goToStep = (next: Step, dir: Direction = "forward") => {
+    setDirection(dir);
     setStep(next);
   };
 
-  const launch = (language: Language, surprise = false) => {
-    const finalContext = contextText.trim() || preset || "interesting popular trending";
-    const params = new URLSearchParams({
-      mood: surprise ? "surprise" : finalContext,
-      duration: String(duration ?? 30),
-      language: surprise ? "any" : language,
-      surprise: String(surprise),
-    });
-    setNavigating(true);
-    window.setTimeout(() => router.push(`/results?${params.toString()}`), 260);
+  const toggleKeyword = (keywordId: string) => {
+    setSelectedKeywords((prev) =>
+      prev.includes(keywordId)
+        ? prev.filter((id) => id !== keywordId)
+        : [...prev, keywordId]
+    );
   };
 
+  const launchSearch = () => {
+    if (!selectedTime || !canSearch) return;
+    goToStep("loading");
+  };
+
+  useEffect(() => {
+    if (step !== "loading" || !selectedTime) return;
+
+    setLoadingIndex(0);
+    const interval = window.setInterval(() => {
+      setLoadingIndex((prev) => (prev + 1) % loadingPhases.length);
+    }, 750);
+
+    const timeout = window.setTimeout(() => {
+      const keywordQuery = selectedKeywords
+        .map((id) => keywordOptions.find((item) => item.id === id)?.query ?? "")
+        .join(" ");
+      const mood = [contextText.trim(), keywordQuery]
+        .join(" ")
+        .trim() || "interesting popular trending";
+      const params = new URLSearchParams({
+        mood,
+        duration: String(selectedTime.minutes),
+        language: "any",
+        surprise: "false",
+      });
+
+      setNavigating(true);
+      window.setTimeout(() => {
+        router.push(`/results?${params.toString()}`);
+      }, 260);
+    }, 1750);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [step, selectedTime, selectedKeywords, contextText, router]);
+
+  const moodKeywords = keywordOptions.filter((item) => item.category === "mood");
+  const contentKeywords = keywordOptions.filter((item) => item.category === "content");
+  const styleKeywords = keywordOptions.filter((item) => item.category === "style");
+
   return (
-    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-8">
+    <div className="min-h-screen overflow-hidden bg-[#0F0F0F] text-white scrollbar-yt">
       <AnimatePresence>
         {navigating && (
           <motion.div
@@ -141,222 +173,385 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="mx-auto max-w-7xl">
-        <div className="extension-shell">
-          <div className="extension-shell-bar">
-            <div className="flex items-center gap-1.5">
-              <span className="shell-dot bg-[#fc5f57]" />
-              <span className="shell-dot bg-[#fdbc2e]" />
-              <span className="shell-dot bg-[#28c840]" />
+      <header className="fixed left-0 right-0 top-0 z-50">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#FF0000] to-[#CC0000] flex items-center justify-center">
+              <Youtube className="h-5 w-5 text-white" />
             </div>
-            <div className="extension-shell-pill">
-              <Youtube size={14} />
-              <span>YouTube</span>
-            </div>
+            <span className="text-lg font-bold text-white">
+              LetMe<span className="text-[#FF0000]">Watch</span>
+            </span>
           </div>
-
-          <div className="grid gap-5 p-3 lg:grid-cols-[1.2fr_0.8fr]">
-            <section className="yt-mock rounded-2xl p-4 md:p-5">
-              <div className="yt-video-frame">
-                <div className="yt-video-overlay">
-                  <div className="yt-logo-chip">
-                    <Youtube size={15} />
-                    <span>LetMeWatch Extension</span>
-                  </div>
-                  <h1 className="font-serif text-[clamp(1.4rem,3.2vw,2.3rem)] font-semibold leading-tight text-white">
-                    Recos YouTube en quelques secondes
-                  </h1>
-                  <p className="max-w-md text-sm text-[var(--yt-muted)]">
-                    Tu gardes ton focus sur la video. Le panneau extension gere le matching.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                {["Compris tout de suite", "Flow 3 etapes", "Reco directe"].map((item) => (
-                  <div key={item} className="yt-chip rounded-xl px-3 py-2 text-xs font-semibold">
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {[1, 2, 3, 4].map((idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{ y: -2 }}
-                    className="yt-feed-item"
-                  >
-                    <div className="yt-feed-thumb" />
-                    <div>
-                      <p className="text-sm font-semibold text-white">Suggestion {idx}</p>
-                      <p className="text-xs text-[var(--yt-muted)]">Pret a regarder</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-
-            <aside className="bistro-card relative overflow-hidden rounded-2xl p-5 md:p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="grid h-8 w-8 place-content-center rounded-lg bg-[var(--yt-red)] text-white">
-                    <Layers size={14} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Panneau Extension</p>
-                    <p className="text-[11px] text-[var(--yt-muted)]">Action rapide</p>
-                  </div>
-                </div>
-                {step !== "welcome" && (
-                  <button onClick={() => toStep("welcome")} className="bistro-pill rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                    Reset
-                  </button>
-                )}
-              </div>
-
-              {step !== "welcome" && (
-                <div className="mb-5">
-                  <StepRail current={step} />
-                </div>
-              )}
-
-              <AnimatePresence custom={direction} mode="wait">
-                {step === "welcome" && (
-                  <motion.div key="welcome" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--yt-border)] bg-[rgba(26,28,31,0.9)] px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-[#ff5f7e]">
-                      <Sparkles size={12} />
-                      Guide rapide
-                    </div>
-                    <h2 className="mt-3 font-serif text-3xl font-semibold text-white">T'en as marre de scroller ?</h2>
-                    <p className="mt-2 text-sm text-[var(--yt-muted)]">
-                      Donne ton timing, ton contexte, ta langue. On te sort des videos directement regardables.
-                    </p>
-                    <div className="mt-5 flex flex-col gap-2">
-                      <button onClick={() => toStep("duration")} className="yt-button rounded-xl bg-[var(--yt-red)] px-4 py-3 text-sm font-semibold text-white">
-                        Commencer
-                      </button>
-                      <button
-                        onClick={() => launch("any", true)}
-                        className="yt-button inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--yt-border-strong)] bg-[rgba(26,28,31,0.94)] px-4 py-3 text-sm font-semibold text-white"
-                      >
-                        <Shuffle size={15} />
-                        Surprise directe
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === "duration" && (
-                  <motion.div key="duration" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                    <h3 className="font-serif text-2xl font-semibold text-white">Combien de temps ?</h3>
-                    <p className="mt-1 text-xs text-[var(--yt-muted)]">On ajuste la duree des videos automatiquement.</p>
-                    <div className="mt-4 grid gap-2">
-                      {DURATIONS.map((item) => (
-                        <button
-                          key={item.value}
-                          onClick={() => {
-                            setDuration(item.value);
-                            toStep("context");
-                          }}
-                          className="yt-button focus-halo yt-card rounded-xl px-4 py-3 text-left"
-                        >
-                          <p className="text-sm font-semibold text-white">{item.label}</p>
-                          <p className="text-xs text-[var(--yt-muted)]">{item.note}</p>
-                        </button>
-                      ))}
-                    </div>
-                    <button onClick={() => toStep("welcome")} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#ff6b87]">
-                      <ChevronLeft size={13} /> Retour
-                    </button>
-                  </motion.div>
-                )}
-
-                {step === "context" && (
-                  <motion.div key="context" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                    <h3 className="font-serif text-2xl font-semibold text-white">Contexte</h3>
-                    <p className="mt-1 text-xs text-[var(--yt-muted)]">Le texte libre passe en priorite.</p>
-                    <div className="yt-input-wrap mt-4 rounded-xl p-3">
-                      <div className="relative">
-                        <Search size={14} className="absolute left-3 top-3.5 text-[var(--yt-muted)]" />
-                        <input
-                          value={contextText}
-                          onChange={(e) => {
-                            setContextText(e.target.value);
-                            if (e.target.value) setPreset(null);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && contextText.trim()) toStep("language");
-                          }}
-                          placeholder="Decris ce que tu veux regarder..."
-                          className="yt-input w-full rounded-lg py-2.5 pl-8 pr-3 text-sm outline-none"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 gap-2">
-                      {PRESETS.map((item) => (
-                        <button
-                          key={item.value}
-                          onClick={() => {
-                            setPreset(item.value);
-                            setContextText("");
-                            toStep("language");
-                          }}
-                          className="yt-button focus-halo rounded-lg border px-2.5 py-2 text-xs font-semibold"
-                          style={{
-                            borderColor: preset === item.value && !contextText ? "rgba(255, 0, 51, 0.45)" : "var(--yt-border)",
-                            background: preset === item.value && !contextText ? "rgba(255, 0, 51, 0.15)" : "rgba(27, 29, 32, 0.9)",
-                            color: "white",
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                    <button onClick={() => toStep("duration")} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#ff6b87]">
-                      <ChevronLeft size={13} /> Retour
-                    </button>
-                  </motion.div>
-                )}
-
-                {step === "language" && (
-                  <motion.div key="language" custom={direction} variants={panelVariants} initial="enter" animate="center" exit="exit">
-                    <h3 className="font-serif text-2xl font-semibold text-white">Langue</h3>
-                    <p className="mt-1 text-xs text-[var(--yt-muted)]">Derniere etape.</p>
-                    <div className="mt-4 grid gap-2">
-                      {LANGUAGES.map((item) => (
-                        <button
-                          key={item.value}
-                          onClick={() => launch(item.value)}
-                          className="yt-button focus-halo yt-card flex items-center justify-between rounded-xl px-4 py-3 text-left"
-                        >
-                          <span className="text-sm font-semibold text-white">{item.label}</span>
-                          <span>{item.icon}</span>
-                        </button>
-                      ))}
-                    </div>
-                    <button onClick={() => toStep("context")} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#ff6b87]">
-                      <ChevronLeft size={13} /> Retour
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="mt-5 rounded-xl border border-[var(--yt-border)] bg-[rgba(22,24,27,0.92)] p-3">
-                <p className="text-xs font-semibold text-white">Etat actuel</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-[var(--yt-border)] bg-[rgba(30,32,35,0.9)] px-2.5 py-1 text-[10px] text-white">
-                    {duration ? `${duration} min` : "temps a definir"}
-                  </span>
-                  <span className="rounded-full border border-[var(--yt-border)] bg-[rgba(30,32,35,0.9)] px-2.5 py-1 text-[10px] text-white">
-                    {contextText.trim() ? "texte libre" : preset ? "preset" : "contexte a definir"}
-                  </span>
-                </div>
-              </div>
-            </aside>
+          <div className="rounded-full border border-[#3F3F3F] bg-[#1F1F1F] px-2.5 py-1 text-xs font-medium text-[#AAAAAA]">
+            EXTENSION STYLE
           </div>
         </div>
+      </header>
+
+      <main className="min-h-screen px-4 pb-8 pt-20 sm:px-6 lg:px-8">
+        <div className="relative mx-auto flex min-h-[82vh] w-full max-w-4xl flex-col justify-center">
+          <AnimatePresence custom={direction} mode="wait">
+            {step === "welcome" && (
+              <motion.section
+                key="welcome"
+                custom={direction}
+                variants={panelVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="flex flex-col items-center justify-center"
+              >
+                <div className="relative mb-8">
+                  <div className="animate-float flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-[#FF0000] to-[#CC0000] shadow-2xl shadow-red-500/40">
+                    <div className="relative">
+                      <Youtube className="h-14 w-14 text-white" />
+                      <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white">
+                        <Utensils className="h-2.5 w-2.5 text-[#FF0000]" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 -z-10 rounded-3xl bg-[#FF0000] opacity-30 blur-3xl" />
+                </div>
+
+                <h1 className="text-center text-5xl font-bold sm:text-6xl">
+                  LetMe<span className="text-[#FF0000]">Watch</span>
+                </h1>
+                <p className="mb-12 mt-4 max-w-xl text-center text-xl text-[#AAAAAA] sm:text-2xl">
+                  Trouve la bonne video YouTube selon ton temps et ton contexte.
+                </p>
+
+                <div className="mb-12 flex flex-wrap justify-center gap-3">
+                  {[
+                    { icon: Clock, text: "Sans compte" },
+                    { icon: Zap, text: "Resultat rapide" },
+                    { icon: Sparkles, text: "Contexte libre" },
+                  ].map((feature) => (
+                    <div
+                      key={feature.text}
+                      className="flex items-center gap-2 rounded-full border border-[#3F3F3F]/50 bg-[#1F1F1F] px-4 py-2.5 text-[#AAAAAA]"
+                    >
+                      <feature.icon className="h-4 w-4 text-[#FF0000]" />
+                      <span className="text-sm font-medium">{feature.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mb-12 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
+                  {[
+                    { num: "1", text: "Choisis ton temps" },
+                    { num: "2", text: "Decris ton contexte" },
+                    { num: "3", text: "Lance la reco" },
+                  ].map((item) => (
+                    <div key={item.num} className="flex items-center gap-3 rounded-xl border border-[#3F3F3F]/30 bg-[#1F1F1F]/50 p-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF0000] text-sm font-bold">
+                        {item.num}
+                      </div>
+                      <span className="text-sm text-[#CCCCCC]">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => goToStep("time")}
+                  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-[#FF0000] to-[#CC0000] px-10 py-5 text-lg font-bold text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/40 active:scale-95"
+                >
+                  <div className="absolute inset-0 -translate-x-[200%] rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-[200%]" />
+                  <span className="relative flex items-center gap-3">
+                    Demarrer
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </button>
+              </motion.section>
+            )}
+
+            {step === "time" && (
+              <motion.section
+                key="time"
+                custom={direction}
+                variants={panelVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="py-8"
+              >
+                <button
+                  onClick={() => goToStep("welcome", "backward")}
+                  className="mb-8 inline-flex items-center gap-2 text-[#AAAAAA] transition-colors hover:text-white"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                  Retour
+                </button>
+
+                <div className="mb-8 flex items-center gap-2">
+                  <div className="h-1 flex-1 rounded-full bg-[#FF0000]" />
+                  <div className="h-1 flex-1 rounded-full bg-[#3F3F3F]" />
+                  <div className="h-1 flex-1 rounded-full bg-[#3F3F3F]" />
+                </div>
+
+                <div className="mb-10 text-center">
+                  <span className="mb-4 inline-block rounded-full bg-[#FF0000]/20 px-3 py-1 text-sm font-medium text-[#FF0000]">
+                    Etape 1 sur 2
+                  </span>
+                  <h2 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
+                    Combien de temps tu as ?
+                  </h2>
+                  <p className="text-[#AAAAAA]">
+                    On va aligner les videos sur ta session.
+                  </p>
+                </div>
+
+                <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+                  {timeOptions.map((option, index) => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        setSelectedTime(option);
+                        window.setTimeout(() => goToStep("context"), 360);
+                      }}
+                      className={`
+                        group relative rounded-2xl border-2 p-6 transition-all duration-300
+                        ${selectedTime?.id === option.id
+                          ? "border-[#FF0000] bg-[#FF0000]/10"
+                          : "border-[#3F3F3F]/50 bg-[#1F1F1F] hover:border-[#FF0000] hover:bg-[#272727]"
+                        }
+                      `}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <span className="text-4xl transition-transform group-hover:scale-110">{option.emoji}</span>
+                        <span className="text-lg font-semibold text-white">{option.label}</span>
+                      </div>
+                      <div className="absolute inset-0 rounded-2xl bg-[#FF0000] opacity-0 transition-opacity group-hover:opacity-5" />
+                    </button>
+                  ))}
+                </div>
+              </motion.section>
+            )}
+
+            {step === "context" && (
+              <motion.section
+                key="context"
+                custom={direction}
+                variants={panelVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="py-8"
+              >
+                <button
+                  onClick={() => goToStep("time", "backward")}
+                  className="mb-6 inline-flex items-center gap-2 text-[#AAAAAA] transition-colors hover:text-white"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                  Retour
+                </button>
+
+                <div className="mb-6 flex items-center gap-2">
+                  <div className="h-1 flex-1 rounded-full bg-[#FF0000]" />
+                  <div className="h-1 flex-1 rounded-full bg-[#FF0000]" />
+                  <div className="h-1 flex-1 rounded-full bg-[#3F3F3F]" />
+                </div>
+
+                <div className="mb-8 text-center">
+                  <span className="mb-3 inline-block rounded-full bg-[#FF0000]/20 px-3 py-1 text-sm font-medium text-[#FF0000]">
+                    Etape 2 sur 2
+                  </span>
+                  <h2 className="mb-2 text-3xl font-bold text-white sm:text-4xl">
+                    Decris ce que tu veux regarder
+                  </h2>
+                  <p className="text-[#AAAAAA]">
+                    Texte libre ou mots-cles rapides.
+                  </p>
+                </div>
+
+                {selectedTime && (
+                  <div className="mb-6 flex justify-center">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-[#272727] px-4 py-2 text-[#AAAAAA]">
+                      <span>{selectedTime.emoji}</span>
+                      <span>{selectedTime.label}</span>
+                      <button onClick={() => goToStep("time", "backward")} className="ml-2 text-[#666666] hover:text-white">
+                        Modifier
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mx-auto mb-6 w-full max-w-2xl">
+                  <textarea
+                    value={contextText}
+                    onChange={(event) => setContextText(event.target.value)}
+                    placeholder="Ex: j ai envie de quelque chose de fun et pas trop long..."
+                    className="w-full resize-none rounded-2xl border-2 border-[#3F3F3F]/50 bg-[#1F1F1F] px-5 py-4 text-lg leading-relaxed text-white outline-none transition-all duration-300 placeholder:text-[#666666] focus:border-[#FF0000]"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="mx-auto mb-8 w-full max-w-3xl">
+                  <p className="mb-4 text-center text-sm text-[#666666]">
+                    Ou selectionne des mots-cles
+                  </p>
+
+                  <div className="mb-3 flex flex-wrap justify-center gap-2">
+                    {moodKeywords.map((keyword) => (
+                      <KeywordPill
+                        key={keyword.id}
+                        keyword={keyword}
+                        selected={selectedKeywords.includes(keyword.id)}
+                        onToggle={toggleKeyword}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="mb-3 flex flex-wrap justify-center gap-2">
+                    {contentKeywords.map((keyword) => (
+                      <KeywordPill
+                        key={keyword.id}
+                        keyword={keyword}
+                        selected={selectedKeywords.includes(keyword.id)}
+                        onToggle={toggleKeyword}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {styleKeywords.map((keyword) => (
+                      <KeywordPill
+                        key={keyword.id}
+                        keyword={keyword}
+                        selected={selectedKeywords.includes(keyword.id)}
+                        onToggle={toggleKeyword}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mx-auto w-full max-w-md">
+                  <button
+                    onClick={launchSearch}
+                    disabled={!canSearch}
+                    className={`
+                      relative w-full overflow-hidden rounded-xl px-8 py-4 text-lg font-bold text-white transition-all duration-300
+                      ${canSearch
+                        ? "bg-gradient-to-r from-[#FF0000] to-[#CC0000] hover:scale-[1.02] hover:shadow-xl hover:shadow-red-500/30 active:scale-[0.98]"
+                        : "cursor-not-allowed bg-[#272727] text-[#666666]"
+                      }
+                    `}
+                  >
+                    {canSearch && (
+                      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]" />
+                    )}
+                    <span className="relative flex items-center justify-center gap-3">
+                      <Search className="h-6 w-6" />
+                      Trouver mes videos
+                      <ArrowRight className="h-5 w-5" />
+                    </span>
+                  </button>
+                </div>
+              </motion.section>
+            )}
+
+            {step === "loading" && (
+              <motion.section
+                key="loading"
+                custom={direction}
+                variants={panelVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="mx-auto w-full max-w-md"
+              >
+                <div className="mb-12 flex flex-col items-center">
+                  <div className="relative">
+                    <div className="h-24 w-24 animate-spin rounded-full border-4 border-[#272727] border-t-[#FF0000]" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF0000] to-[#CC0000]">
+                        <Youtube className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-20 blur-2xl" />
+                  </div>
+
+                  <p className="mt-8 text-2xl font-bold text-white">
+                    Preparation en cours...
+                  </p>
+                  <p className="mt-2 text-[#AAAAAA]">
+                    Moins de 10 secondes.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {loadingPhases.map((phase, index) => {
+                    const active = index === loadingIndex;
+                    const done = index < loadingIndex;
+                    return (
+                      <div
+                        key={phase.text}
+                        className={`
+                          flex items-center gap-4 rounded-xl border p-4 transition-all duration-300
+                          ${active
+                            ? "scale-105 border-[#FF0000]/50 bg-[#FF0000]/10"
+                            : done
+                              ? "border-[#3F3F3F]/30 bg-[#1F1F1F] opacity-65"
+                              : "border-[#3F3F3F]/30 bg-[#1F1F1F] opacity-40"
+                          }
+                        `}
+                      >
+                        <div
+                          className={`
+                            flex h-10 w-10 items-center justify-center rounded-lg
+                            ${active ? "bg-[#FF0000] text-white" : "bg-[#272727] text-[#666666]"}
+                          `}
+                        >
+                          {active ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <phase.icon className="h-5 w-5" />
+                          )}
+                        </div>
+                        <span className={active ? "text-white" : "text-[#AAAAAA]"}>
+                          {phase.text}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.section>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
+
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-[#FF0000] opacity-[0.025] blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-[#FF0000] opacity-[0.02] blur-3xl" />
       </div>
-    </main>
+    </div>
+  );
+}
+
+function KeywordPill({
+  keyword,
+  selected,
+  onToggle,
+}: {
+  keyword: KeywordOption;
+  selected: boolean;
+  onToggle: (keywordId: string) => void;
+}) {
+  return (
+    <button
+      onClick={() => onToggle(keyword.id)}
+      className={`
+        inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-all duration-200
+        ${selected
+          ? "bg-[#FF0000] text-white shadow-md shadow-red-500/20"
+          : "border border-[#3F3F3F]/50 bg-[#272727] text-[#AAAAAA] hover:bg-[#3F3F3F] hover:text-white"
+        }
+      `}
+    >
+      <span>{keyword.emoji}</span>
+      <span>{keyword.label}</span>
+    </button>
   );
 }
