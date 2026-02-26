@@ -62,6 +62,109 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.extension-shell {
+  border: 1px solid var(--yt-border);
+  border-radius: 18px;
+  background: rgba(16, 17, 19, 0.9);
+  box-shadow: 0 24px 44px rgba(0, 0, 0, 0.32);
+  overflow: hidden;
+}
+
+.extension-shell-bar {
+  height: 42px;
+  border-bottom: 1px solid var(--yt-border);
+  background: rgba(20, 22, 24, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.shell-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.extension-shell-pill {
+  border: 1px solid var(--yt-border);
+  border-radius: 999px;
+  background: rgba(30, 32, 35, 0.9);
+  color: var(--yt-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.yt-mock {
+  border: 1px solid var(--yt-border);
+  background: linear-gradient(180deg, rgba(23, 25, 28, 0.92), rgba(19, 21, 24, 0.92));
+}
+
+.yt-video-frame {
+  border-radius: 14px;
+  border: 1px solid var(--yt-border);
+  background: linear-gradient(140deg, #1f2328, #16191d);
+  min-height: 240px;
+  position: relative;
+  overflow: hidden;
+}
+
+.yt-video-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 35%, rgba(0, 0, 0, 0.25));
+}
+
+.yt-video-overlay {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.yt-logo-chip {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 22, 25, 0.86);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.yt-feed-item {
+  border: 1px solid var(--yt-border);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26, 28, 31, 0.9);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.yt-feed-item:hover {
+  border-color: var(--yt-border-strong);
+}
+
+.yt-feed-thumb {
+  width: 58px;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #303744, #1d232d);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
 .bistro-pill {
   border: 1px solid var(--yt-border);
   background: rgba(34, 36, 40, 0.88);
