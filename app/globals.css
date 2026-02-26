@@ -34,9 +34,9 @@ body {
   color: var(--yt-text);
   font-family: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, sans-serif;
   background:
-    radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.045), transparent 32%),
-    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.03), transparent 42%),
-    linear-gradient(180deg, #0f0f0f, #121316 44%, #101114);
+    radial-gradient(circle at 50% -8%, rgba(255, 255, 255, 0.055), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.04), transparent 44%),
+    linear-gradient(180deg, #141518, #17191d 44%, #14171b);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -200,6 +200,7 @@ body {
 
 .yt-button:hover {
   transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
 }
 
 .yt-chip {
