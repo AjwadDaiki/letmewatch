@@ -42,7 +42,7 @@ const timeOptions: TimeOption[] = [
 
 const keywordOptions: KeywordOption[] = [
   { id: "lazy", label: "Flemme", emoji: "😴", category: "mood", query: "relaxing chill easy watch" },
-  { id: "tired", label: "Creve", emoji: "😮‍💨", category: "mood", query: "light entertaining low effort" },
+  { id: "tired", label: "Fatigue", emoji: "😮‍💨", category: "mood", query: "light entertaining low effort" },
   { id: "happy", label: "Bonne vibe", emoji: "😄", category: "mood", query: "positive upbeat fun" },
   { id: "stressed", label: "Stresse", emoji: "😵", category: "mood", query: "calm soothing no stress" },
   { id: "funny", label: "Drole", emoji: "😂", category: "content", query: "funny comedy entertainment humor" },
@@ -216,13 +216,13 @@ export default function Home() {
                   LetMe<span className="text-[#FF0000]">Watch</span>
                 </h1>
                 <p className="mb-12 mt-4 max-w-xl text-center text-xl text-[#AAAAAA] sm:text-2xl">
-                  Trouve la bonne video YouTube selon ton temps et ton contexte.
+                  Trouve la bonne video YouTube selon ton temps et tes envies.
                 </p>
 
                 <div className="mb-12 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
                   {[
                     { num: "1", text: "Choisis ton temps" },
-                    { num: "2", text: "Decris ton contexte" },
+                    { num: "2", text: "Decris ce que t as envie de regarder" },
                     { num: "3", text: "Choisis la langue" },
                   ].map((item) => (
                     <div
@@ -344,7 +344,7 @@ export default function Home() {
                     Etape 2 sur 3
                   </span>
                   <h2 className="mb-2 text-3xl font-bold text-white sm:text-4xl">
-                    Decris ce que tu veux regarder
+                    Decris ce que t as envie de regarder
                   </h2>
                   <p className="text-[#AAAAAA]">
                     Ecris librement, puis valide avec Entrer.
@@ -364,22 +364,23 @@ export default function Home() {
                 )}
 
                 <div className="mx-auto mb-5 w-full max-w-2xl">
-                  <div className="relative">
+                  <div className="group relative">
+                    <div className="pointer-events-none absolute -inset-1 rounded-[20px] bg-gradient-to-r from-transparent via-[#FF0000]/18 to-transparent opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100" />
                     <textarea
                       value={contextText}
                       onChange={(event) => setContextText(event.target.value)}
                       onKeyDown={handleContextEnter}
-                      placeholder="Ex: j ai envie de quelque chose de fun et pas trop long..."
-                      className="w-full resize-none rounded-2xl border-2 border-[#3F3F3F]/50 bg-[#1F1F1F] px-5 py-4 pr-32 text-lg leading-relaxed text-white outline-none transition-all duration-300 placeholder:text-[#666666] focus:border-[#FF0000] focus:shadow-[0_0_0_4px_rgba(255,0,51,0.12)]"
+                      placeholder="Ex: storytelling gaming sur n importe quel jeu video..."
+                      className="relative z-[1] w-full resize-none rounded-2xl border-2 border-[#3F3F3F]/50 bg-[#1F1F1F] px-5 py-4 pr-44 text-lg leading-relaxed text-white outline-none transition-[border-color,box-shadow,transform,background-color] duration-300 placeholder:text-[#666666] hover:border-[#585858] focus:-translate-y-0.5 focus:border-[#FF0000] focus:shadow-[0_0_0_4px_rgba(255,0,51,0.12)]"
                       rows={3}
                     />
                     <button
                       onClick={() => canContinue && goToStep("language")}
                       disabled={!canContinue}
-                      className="yt-button absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-lg bg-[#FF0000] px-3.5 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
+                      className="yt-button absolute bottom-2.5 right-2.5 z-[2] inline-flex min-w-[124px] items-center justify-center gap-2 rounded-xl border border-[#ff4f70]/60 bg-gradient-to-r from-[#FF0000] to-[#D5002E] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/35 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-red-700/25 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       Entrer
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -593,3 +594,4 @@ function KeywordPill({
     </button>
   );
 }
+
