@@ -11,155 +11,35 @@ export interface MoodConfig {
 }
 
 function makeMood(
-  label: string,
-  emoji: string,
-  moodValue: string,
-  summary: string,
-  bullets: string[]
+  label: string, emoji: string, moodValue: string,
+  title: string, description: string, summary: string,
+  bullets: string[], faqExtra?: { q: string; a: string }
 ): MoodConfig {
-  return {
-    label,
-    emoji,
-    moodValue,
-    title: `${label} YouTube Recommendations | LetMeWatch`,
-    description: `Get ${label.toLowerCase()} YouTube videos matched to your available time and context. No endless scrolling.`,
-    h1: `${label} videos to watch now`,
-    subheading: summary,
-    whatToExpect: bullets,
-    faqs: [
-      {
-        q: `How does ${label.toLowerCase()} mode work?`,
-        a: `LetMeWatch uses your context, duration, and language to find the most relevant ${label.toLowerCase()} videos.`,
-      },
-      {
-        q: "Can I change duration and language?",
-        a: "Yes. You can relaunch recommendations with a different duration, language, or context at any time.",
-      },
-    ],
-  };
+  const faqs: { q: string; a: string }[] = [
+    { q: `How does ${label.toLowerCase()} mode work?`, a: `LetMeWatch uses your mood, duration, and language to find the most relevant ${label.toLowerCase()} videos on YouTube — matched to your exact meal time.` },
+    { q: "Can I change duration and language?", a: "Yes. You can relaunch recommendations with a different duration, language, or context at any time." },
+  ];
+  if (faqExtra) faqs.push(faqExtra);
+  return { label, emoji, moodValue, title, description, h1: title, subheading: summary, whatToExpect: bullets, faqs };
 }
 
 export const MOOD_CONFIG: Record<string, MoodConfig> = {
-  funny: makeMood(
-    "Funny",
-    "😂",
-    "funny comedy entertainment humor sketches",
-    "Fast comedy picks when you want something light and instantly watchable.",
-    [
-      "Stand-up extracts",
-      "Sketch and parody formats",
-      "Reaction and commentary",
-      "Short entertaining compilations",
-    ]
-  ),
-  chill: makeMood(
-    "Chill",
-    "😌",
-    "relaxing calm lofi ambient chill vibe",
-    "Low-pressure videos for calm sessions with no noise overload.",
-    [
-      "Lofi and ambient playlists",
-      "Walking and travel calm edits",
-      "Nature and slow visuals",
-      "Soft educational formats",
-    ]
-  ),
-  educational: makeMood(
-    "Educational",
-    "🧠",
-    "educational documentary explainer knowledge science history",
-    "Learn while watching with clean explainers adapted to your available time.",
-    [
-      "Compact explainers",
-      "Science and tech topics",
-      "History and culture",
-      "Useful how-things-work videos",
-    ]
-  ),
-  gaming: makeMood(
-    "Gaming",
-    "🎮",
-    "gaming gameplay let's play commentary esports highlights",
-    "Gameplay, highlights, and commentary that fit your exact session length.",
-    [
-      "Gameplay highlights",
-      "Review and commentary",
-      "Esport moments",
-      "Funny gaming formats",
-    ]
-  ),
-  cooking: makeMood(
-    "Cooking",
-    "🍜",
-    "food cooking recipe street food mukbang culinary",
-    "Food and cooking-focused content curated for short or long watch slots.",
-    [
-      "Street food edits",
-      "Recipe breakdowns",
-      "Chef techniques",
-      "Food culture videos",
-    ]
-  ),
-  cinema: makeMood(
-    "Cinema",
-    "🎬",
-    "cinema movie review film analysis trailer breakdown",
-    "Movie reviews and film analysis selected for direct watchability.",
-    [
-      "Review and critique",
-      "Film analysis",
-      "Trailer breakdown",
-      "Cinema references",
-    ]
-  ),
-  short: makeMood(
-    "Short",
-    "⚡",
-    "short quick interesting viral trending under 10 minutes",
-    "Quick picks when you only have a few minutes and still want quality.",
-    [
-      "5-10 minute formats",
-      "Quick explainers",
-      "Trending clips",
-      "High signal low commitment",
-    ]
-  ),
-  drama: makeMood(
-    "Drama",
-    "🎭",
-    "drama reaction commentary story news controversy tea",
-    "Story-driven commentary and reaction content with strong hooks.",
-    [
-      "Commentary videos",
-      "Reaction formats",
-      "Storytime narratives",
-      "Current topic breakdowns",
-    ]
-  ),
-  music: makeMood(
-    "Music",
-    "🎵",
-    "music live concert performance artist session playlist",
-    "Live sessions and performance picks adapted to the time you have.",
-    [
-      "Live performances",
-      "Studio sessions",
-      "Artist deep dives",
-      "Music discovery",
-    ]
-  ),
-  science: makeMood(
-    "Science",
-    "🔬",
-    "science technology space physics innovation research explained",
-    "Curiosity-driven science and tech content selected for your timing.",
-    [
-      "Space and astronomy",
-      "Physics and chemistry",
-      "Tech and innovation",
-      "Research explainers",
-    ]
-  ),
+  funny: makeMood("Funny","😂","funny comedy entertainment humor sketches","Funny YouTube Videos to Watch While Eating","Find the best funny YouTube videos to watch while eating. Comedy, fails, sketches — AI picks the perfect laugh for your meal duration.","Fast comedy picks when you want something light and instantly watchable.",["Stand-up extracts","Sketch and parody formats","Reaction and commentary","Short entertaining compilations"],{q:"What are the best funny YouTube channels to watch while eating?",a:"LetMeWatch AI-picks the funniest YouTube content matched to your exact meal duration — from stand-up to sketches and viral compilations."}),
+  chill: makeMood("Chill","😌","relaxing calm lofi ambient chill vibe","Chill YouTube Videos to Watch While Eating","Find chill, relaxing YouTube videos to watch during your meal. Lofi, nature, calm content — AI-matched to your mood and time.","Low-pressure videos for calm sessions with no noise overload.",["Lofi and ambient playlists","Walking and travel calm edits","Nature and slow visuals","Soft educational formats"],{q:"What chill videos are good to watch while eating?",a:"Lofi music, calm travel vlogs, nature documentaries, and ambient content are perfect for eating. LetMeWatch finds the right match for your mood and duration."}),
+  educational: makeMood("Educational","🧠","educational documentary explainer knowledge science history","Educational YouTube Videos to Watch While Eating","Learn something new during your meal. Find the best educational YouTube videos matched to your lunch or dinner duration.","Learn while watching with clean explainers adapted to your available time.",["Compact explainers","Science and tech topics","History and culture","Useful how-things-work videos"],{q:"What educational videos should I watch while eating?",a:"Turn meal time into learning time. LetMeWatch finds documentaries, explainers, and knowledge content perfectly matched to your lunch or dinner duration."}),
+  gaming: makeMood("Gaming","🎮","gaming gameplay commentary esports highlights","Gaming YouTube Videos to Watch While Eating","Find the best gaming YouTube videos to watch while eating. Reviews, commentary — matched to your meal time.","Gameplay, highlights, and commentary that fit your exact session length.",["Gameplay highlights","Review and commentary","Esport moments","Funny gaming formats"],{q:"What gaming videos should I watch while eating?",a:"Gaming commentary and esports highlights are great for meals. LetMeWatch matches them to your exact meal duration so nothing gets cut off."}),
+  cooking: makeMood("Cooking","🍜","food cooking recipe street food mukbang culinary","Cooking YouTube Videos to Watch While Eating","Watch cooking videos while you eat — the perfect irony. AI finds the best culinary YouTube content for your meal time.","Food and cooking-focused content curated for short or long watch slots.",["Street food edits","Recipe breakdowns","Chef techniques","Food culture videos"],{q:"Is it good to watch cooking videos while eating?",a:"Absolutely. Cooking videos while eating is a certified good time. LetMeWatch curates the best culinary content matched to your exact meal duration."}),
+  cinema: makeMood("Cinema","🎬","cinema movie review film analysis trailer breakdown","Cinema YouTube Videos to Watch While Eating","Movie reviews and film analysis to watch while eating. AI-matched to your mood and meal duration.","Movie reviews and film analysis selected for direct watchability.",["Review and critique","Film analysis","Trailer breakdown","Cinema references"]),
+  short: makeMood("Short","⚡","short quick interesting viral trending under 10 minutes","Short YouTube Videos to Watch While Eating (Under 15 min)","Find short YouTube videos perfect for a quick meal. Under 15 minutes, AI-matched to your mood.","Quick picks when you only have a few minutes and still want quality.",["5-10 minute formats","Quick explainers","Trending clips","High signal low commitment"],{q:"What are good short YouTube videos to watch during a quick lunch?",a:"LetMeWatch specializes in finding short, high-quality YouTube videos that fit your exact lunch break. Under 15 minutes, matched to your mood."}),
+  drama: makeMood("Drama","🎭","drama reaction commentary story news controversy tea","Drama & Commentary YouTube Videos While Eating","Story-driven commentary and reaction content to watch while eating. AI-matched to your meal duration.","Story-driven commentary and reaction content with strong hooks.",["Commentary videos","Reaction formats","Storytime narratives","Current topic breakdowns"]),
+  music: makeMood("Music","🎵","music live concert performance artist session playlist","Music YouTube Videos to Watch While Eating","Find the best music YouTube content to enjoy during your meal. Live sessions, reviews, playlists — matched to your mood.","Live sessions and performance picks adapted to the time you have.",["Live performances","Studio sessions","Artist deep dives","Music discovery"],{q:"What music YouTube videos are good while eating?",a:"Live sessions, acoustic performances, music documentaries, and concert recordings are great for meals. LetMeWatch matches the perfect music content to your meal duration."}),
+  science: makeMood("Science","🔬","science technology space physics innovation research explained","Science YouTube Videos to Watch While Eating","Curiosity-driven science and tech content to watch during your meal. AI-matched to your exact duration.","Curiosity-driven science and tech content selected for your timing.",["Space and astronomy","Physics and chemistry","Tech and innovation","Research explainers"]),
+  "true-crime": makeMood("True Crime","🕵️","true crime documentary investigation case crime mystery","True Crime YouTube Videos to Watch While Eating","Find true crime YouTube videos perfectly timed for your meal. Investigations, cases, stories — matched to your mood and duration.","Gripping true crime content matched to your exact meal time.",["Cold cases and investigations","Crime documentaries","Case breakdowns","Mystery solved formats"],{q:"What true crime videos should I watch while eating?",a:"True crime documentaries, case investigations, and crime breakdowns are surprisingly popular for meal time. LetMeWatch finds the right one for your exact meal duration."}),
+  anime: makeMood("Anime","🎌","anime review analysis ranking tier list discussion recommendation","Anime YouTube Videos to Watch While Eating","Find anime reviews, rankings and analysis videos to watch during your meal. AI-matched to your exact mood and duration.","Anime reviews, tier lists, and analysis matched to your meal time.",["Anime reviews and rankings","Season analysis","Tier lists","Recommendation videos"],{q:"What anime YouTube content is good to watch while eating?",a:"Anime reviews, tier lists, and episode discussions are great for meal time. LetMeWatch finds the best anime YouTube content matched to your exact meal duration."}),
+  tech: makeMood("Tech","💻","tech review programming software hardware startup innovation","Tech YouTube Videos to Watch While Eating","Find tech reviews, programming talks and tech news YouTube videos to watch during your meal. AI-matched to your duration.","Stay up to date on tech during your meal — matched to your exact time slot.",["Tech reviews","Programming discussions","Startup stories","Hardware and software breakdowns"],{q:"What tech YouTube videos should I watch while eating?",a:"Tech reviews, coding talks, startup documentaries, and innovation content make great meal companions. LetMeWatch matches them to your lunch or dinner duration."}),
+  travel: makeMood("Travel","🌍","travel exploration nature world discovery culture adventure","Travel YouTube Videos to Watch While Eating","Find travel and exploration YouTube videos to watch during your meal. World destinations, culture, adventures — AI-matched.","Discover the world from your table — matched to your meal duration.",["Destination guides","Cultural exploration","Adventure and nature","Street food travel"],{q:"What travel YouTube videos are good while eating?",a:"Travel vlogs, destination guides, and cultural exploration videos are perfect for meal time. LetMeWatch finds the best travel content matched to your exact meal duration."}),
+  sports: makeMood("Sports","⚽","sports highlights analysis commentary recap best moments","Sports YouTube Videos to Watch While Eating","Find the best sports YouTube highlights and analysis to watch during your meal. AI-matched to your duration.","Sports highlights and analysis perfectly timed for your meal.",["Match highlights","Best moments compilations","Sports analysis","Athlete stories"]),
+  discovery: makeMood("Discovery","🔭","interesting popular trending quality educational entertaining discovery","Discovery YouTube Videos to Watch While Eating","Let AI surprise you with interesting, trending YouTube content for your meal. No algorithm, just quality picks.","Unexpected quality picks when you want to be surprised.",["Trending quality content","Hidden gems","Cross-topic discovery","High-signal recommendations"],{q:"What is a good YouTube video to watch while eating if I have no idea?",a:"That is exactly what Discovery mode is for. LetMeWatch AI finds the most interesting, trending YouTube content matched to your meal duration."}),
 };
 
 export const MOOD_SLUGS = Object.keys(MOOD_CONFIG);

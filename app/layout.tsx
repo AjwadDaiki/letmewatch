@@ -15,49 +15,53 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://letmewatch.vercel.app";
+const SITE_URL = "https://letmewatch.me";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Find the Right YouTube Video Fast | LetMeWatch",
+    default: "LetMeWatch — Find the Perfect YouTube Video to Watch While Eating",
     template: "%s | LetMeWatch",
   },
   description:
-    "Stop scrolling. Tell us what you want to watch and how much time you have - we find the right YouTube video in seconds.",
+    "Stop spending 10 minutes finding what to watch while eating. Tell us your mood, get the perfect YouTube video in seconds. AI-powered, no account needed.",
   keywords: [
-    "what to watch on youtube",
-    "youtube recommendations",
-    "what to watch now",
-    "video recommendation app",
-    "find a youtube video quickly",
-    "quoi regarder sur youtube",
-    "que ver en youtube ahora",
+    "what to watch while eating",
+    "videos to watch while eating",
+    "youtube while eating",
+    "what to watch during lunch",
+    "youtube videos to watch while eating alone",
+    "what to watch while eating dinner",
+    "best youtube channels while eating",
+    "quoi regarder en mangeant",
+    "que ver en youtube mientras como",
   ],
   authors: [{ name: "LetMeWatch" }],
   creator: "LetMeWatch",
   openGraph: {
     type: "website",
+    locale: "en_US",
     url: SITE_URL,
     siteName: "LetMeWatch",
-    title: "Find the Right YouTube Video Fast",
+    title: "LetMeWatch — Find the Perfect YouTube Video to Watch While Eating",
     description:
-      "Stop scrolling. Tell us what you want to watch and how much time you have - we find the right YouTube video in seconds.",
+      "Stop spending 10 minutes finding what to watch while eating. AI picks the perfect YouTube video for your mood in seconds.",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "LetMeWatch - Smart video picks for your watch session",
+        alt: "LetMeWatch - Find YouTube videos to watch while eating",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Find the Right YouTube Video Fast",
+    title: "LetMeWatch — Find the Perfect YouTube Video to Watch While Eating",
     description:
-      "Stop scrolling. AI picks the right YouTube video for your current session in seconds.",
+      "AI picks the perfect YouTube video for your meal in seconds. No account, no scrolling.",
     images: ["/opengraph-image"],
+    creator: "@letmewatch",
   },
   robots: {
     index: true,
@@ -73,10 +77,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
     languages: {
-      en: SITE_URL,
-      fr: `${SITE_URL}/lang/fr`,
-      es: `${SITE_URL}/lang/es`,
-      pt: `${SITE_URL}/lang/pt`,
+      "en-US": SITE_URL,
+      "fr-FR": `${SITE_URL}/fr`,
+      "es-ES": `${SITE_URL}/es`,
+      "pt-BR": `${SITE_URL}/pt`,
     },
   },
 };
@@ -90,9 +94,9 @@ const schemaOrg = {
       name: "LetMeWatch",
       url: SITE_URL,
       description:
-        "AI-powered YouTube recommendations. Set your context, available time, and language to get instantly watchable videos.",
+        "AI-powered YouTube video recommender for meal times. Tell us your mood, get the perfect video in seconds.",
       applicationCategory: "EntertainmentApplication",
-      operatingSystem: "Any",
+      operatingSystem: "Web",
       offers: {
         "@type": "Offer",
         price: "0",
@@ -111,18 +115,26 @@ const schemaOrg = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "What should I watch on YouTube right now?",
+          name: "What should I watch while eating?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "LetMeWatch uses AI to find the right YouTube video for your current context. Just set your available time, what you want to watch, and your language preference.",
+            text: "LetMeWatch uses AI to find the perfect YouTube video for your meal based on your mood and how much time you have. Just describe your vibe and get instant recommendations — no scrolling needed.",
           },
         },
         {
           "@type": "Question",
-          name: "How does LetMeWatch work?",
+          name: "What are good YouTube videos to watch while eating?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Answer 3 quick questions (duration, context, language). Our AI generates optimized YouTube search queries and returns the best videos matched to your input.",
+            text: "The best YouTube videos to watch while eating depend on your mood and meal duration. Funny videos, gaming commentary, documentaries, and video essays are popular choices. LetMeWatch AI-matches the perfect video to your exact mood.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How do I find a YouTube video to watch during lunch?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "On LetMeWatch, describe your mood or pick a category, select your meal duration, and get instant AI-curated YouTube recommendations. The whole process takes under 10 seconds.",
           },
         },
         {
