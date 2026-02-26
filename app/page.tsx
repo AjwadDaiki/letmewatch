@@ -1,397 +1,511 @@
-﻿"use client";
+"use client";
 
-import { useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  Clock,
+  ArrowRight,
+  TrendingUp,
+  Play,
   ChevronLeft,
-  ChevronRight,
-  Clock3,
-  Languages,
-  MessageSquareText,
+  PenLine,
+  List,
+  RotateCcw,
+  Check,
+  Sparkles,
+  Laugh,
+  Coffee,
+  BookOpen,
+  Gamepad2,
+  ChefHat,
+  Film,
+  Music,
+  Zap,
+  Globe,
   Shuffle,
-  Youtube,
 } from "lucide-react";
 
-const DURATIONS = [
-  { label: "15 min", value: 15, note: "Rapide", icon: "⚡" },
-  { label: "30 min", value: 30, note: "Standard", icon: "⏱️" },
-  { label: "1h+", value: 65, note: "Pose longue", icon: "🕰️" },
+/* ── Types ── */
+interface TimeOption {
+  value: number;
+  label: string;
+  description: string;
+  videos: string;
+}
+
+interface Category {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  description: string;
+  bg: string;
+  color: string;
+}
+
+type Step = "time" | "input" | "summary";
+type InputMode = "write" | "category" | null;
+
+/* ── Data ── */
+const timeOptions: TimeOption[] = [
+  { value: 15, label: "15 min", description: "Pause rapide", videos: "2–3 vidéos" },
+  { value: 30, label: "30 min", description: "Repas standard", videos: "4–6 vidéos" },
+  { value: 65, label: "1h+",    description: "Long repas",     videos: "8–12 vidéos" },
 ];
 
-const MOODS = [
-  { label: "Drole", value: "funny comedy entertainment humor", icon: "😂" },
-  { label: "Chill", value: "relaxing calm lofi ambient chill", icon: "😌" },
-  { label: "Info", value: "educational documentary explained knowledge", icon: "🧠" },
-  { label: "Gaming", value: "gaming gameplay let's play commentary", icon: "🎮" },
-  { label: "Cuisine", value: "food cooking recipe street food", icon: "🍜" },
-  { label: "Cinema", value: "cinema movie review film analysis", icon: "🎬" },
-  { label: "Decouverte", value: "travel nature exploration discovery world", icon: "🌍" },
-  { label: "Musique", value: "music live concert performance artist", icon: "🎵" },
-  { label: "Science", value: "science technology innovation space physics", icon: "🔬" },
-  { label: "Surprise", value: "interesting popular trending viral quality", icon: "🎲" },
+const categories: Category[] = [
+  { id: "funny",       label: "Drôle",       icon: <Laugh     className="w-[18px] h-[18px]" />, description: "Humour & sketches",    bg: "rgba(234,179,8,0.15)",   color: "#eab308" },
+  { id: "chill",       label: "Détente",     icon: <Coffee    className="w-[18px] h-[18px]" />, description: "Calme & ambient",      bg: "rgba(59,130,246,0.15)",  color: "#60a5fa" },
+  { id: "educational", label: "Éducatif",    icon: <BookOpen  className="w-[18px] h-[18px]" />, description: "Apprendre en mangeant",bg: "rgba(34,197,94,0.15)",   color: "#4ade80" },
+  { id: "gaming",      label: "Gaming",      icon: <Gamepad2  className="w-[18px] h-[18px]" />, description: "Let's play & esport",  bg: "rgba(168,85,247,0.15)",  color: "#c084fc" },
+  { id: "cooking",     label: "Cuisine",     icon: <ChefHat   className="w-[18px] h-[18px]" />, description: "Recettes & food",      bg: "rgba(249,115,22,0.15)",  color: "#fb923c" },
+  { id: "cinema",      label: "Cinéma",      icon: <Film      className="w-[18px] h-[18px]" />, description: "Critiques & analyses", bg: "rgba(236,72,153,0.15)",  color: "#f472b6" },
+  { id: "music",       label: "Musique",     icon: <Music     className="w-[18px] h-[18px]" />, description: "Clips & lives",        bg: "rgba(6,182,212,0.15)",   color: "#22d3ee" },
+  { id: "science",     label: "Science",     icon: <Zap       className="w-[18px] h-[18px]" />, description: "Tech & découvertes",   bg: "rgba(16,185,129,0.15)",  color: "#34d399" },
+  { id: "travel",      label: "Voyage",      icon: <Globe     className="w-[18px] h-[18px]" />, description: "Nature & exploration",  bg: "rgba(99,102,241,0.15)",  color: "#818cf8" },
+  { id: "surprise",    label: "Surprise",    icon: <Shuffle   className="w-[18px] h-[18px]" />, description: "Laisse-toi surprendre",bg: "rgba(239,68,68,0.15)",   color: "#f87171" },
 ];
 
-const LANGUAGES = [
-  { label: "Francais", value: "fr", flag: "🇫🇷" },
-  { label: "English", value: "en", flag: "🇬🇧" },
-  { label: "Peu importe", value: "any", flag: "🌐" },
-];
-
-type Step = "welcome" | "duration" | "mood" | "language";
-const STEP_ORDER: Step[] = ["welcome", "duration", "mood", "language"];
-
-const pageVariants: Variants = {
-  enter: (direction: number) => ({
-    opacity: 0,
-    y: 22,
-    x: direction > 0 ? 24 : -24,
-    filter: "blur(3px)",
-  }),
-  center: {
-    opacity: 1,
-    y: 0,
-    x: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
-  },
-  exit: (direction: number) => ({
-    opacity: 0,
-    y: -14,
-    x: direction > 0 ? -18 : 18,
-    filter: "blur(2px)",
-    transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
-  }),
+/* ── Shared style tokens ── */
+const S = {
+  card:    { background: "hsl(220,15%,12%)", border: "1px solid hsl(220,15%,20%)", borderRadius: "14px" } as const,
+  muted:   "hsl(220,10%,55%)",
+  red:     "#ef4444",
+  redSoft: "rgba(239,68,68,0.2)",
+  surface: "hsl(220,15%,18%)",
 };
 
-function SplitTitle({ text }: { text: string }) {
-  const words = text.split(" ");
-  return (
-    <h1 className="font-serif font-semibold text-[clamp(2.1rem,5.6vw,4rem)] leading-[0.97] tracking-tight text-[var(--charcoal)]">
-      {words.map((word, index) => (
-        <motion.span
-          key={`${word}-${index}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05, duration: 0.34 }}
-          className="inline-block"
-        >
-          {word}
-          {index < words.length - 1 ? "\u00A0" : ""}
-        </motion.span>
-      ))}
-    </h1>
-  );
-}
-
-function StepProgress({ current }: { current: Step }) {
-  const labels = [
-    { step: "duration", label: "Temps" },
-    { step: "mood", label: "Contexte" },
-    { step: "language", label: "Langue" },
-  ] as const;
-
-  const currentIndex = Math.max(0, labels.findIndex((item) => item.step === current));
-  return (
-    <div className="flex items-center gap-4 flex-wrap">
-      {labels.map((item, index) => {
-        const active = index <= currentIndex;
-        return (
-          <div key={item.step} className="flex items-center gap-2">
-            <motion.div
-              layout
-              className="h-1.5 rounded-full"
-              animate={{
-                width: index === currentIndex ? 44 : 18,
-                backgroundColor: active ? "var(--wine)" : "rgba(21,32,51,0.2)",
-              }}
-            />
-            <span
-              className="text-[10px] uppercase tracking-[0.16em]"
-              style={{ color: active ? "var(--wine)" : "rgba(21,32,51,0.55)" }}
-            >
-              {item.label}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
+/* ──────────────────────────────────────────── */
 export default function Home() {
   const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [step, setStep]       = useState<Step>("time");
+  const [time, setTime]       = useState<number | null>(null);
+  const [mode, setMode]       = useState<InputMode>(null);
+  const [text, setText]       = useState("");
+  const [cat, setCat]         = useState<string | null>(null);
+  const [fading, setFading]   = useState(false);
 
-  const [step, setStep] = useState<Step>("welcome");
-  const [direction, setDirection] = useState(1);
-  const [duration, setDuration] = useState<number | null>(null);
-  const [mood, setMood] = useState<string | null>(null);
-  const [customMood, setCustomMood] = useState("");
-  const [navigating, setNavigating] = useState(false);
+  const canSubmit = mode === "write" ? text.trim().length > 0 : cat !== null;
+  const selectedCat = categories.find((c) => c.id === cat);
 
-  const stepIndex = useMemo(() => STEP_ORDER.indexOf(step), [step]);
-  const toStep = (next: Step) => {
-    const nextIndex = STEP_ORDER.indexOf(next);
-    setDirection(nextIndex >= stepIndex ? 1 : -1);
-    setStep(next);
-  };
+  function goTo(next: Step, delay = 380) {
+    setFading(true);
+    setTimeout(() => { setStep(next); setFading(false); }, delay);
+  }
 
-  const pushToResults = (lang: string, surprise = false) => {
-    const finalMood = customMood.trim() || mood || "interesting popular trending";
-    const params = new URLSearchParams({
-      mood: surprise ? "surprise" : finalMood,
-      duration: String(duration ?? 30),
-      language: surprise ? "any" : lang,
-      surprise: String(surprise),
-    });
+  function handleTimeSelect(v: number) {
+    setTime(v);
+    goTo("input");
+  }
 
-    setNavigating(true);
-    window.setTimeout(() => router.push(`/results?${params.toString()}`), 280);
-  };
+  function handleModeSelect(m: InputMode) {
+    setMode(m);
+    if (m === "write") setCat(null);
+    else setText("");
+  }
 
+  function handleCatSelect(id: string) {
+    setCat(id);
+    setTimeout(() => goTo("summary"), 180);
+  }
+
+  function handleSubmit() {
+    if (canSubmit) goTo("summary");
+  }
+
+  function handleBack() {
+    if (step === "input") { setMode(null); setTime(null); goTo("time"); }
+    else if (step === "summary") goTo("input");
+  }
+
+  function handleReset() {
+    setFading(true);
+    setTimeout(() => {
+      setStep("time"); setTime(null); setMode(null);
+      setText(""); setCat(null); setFading(false);
+    }, 380);
+  }
+
+  function handleSearch() {
+    const mood = mode === "write" ? text : (cat || "chill");
+    const lang = "fr";
+    router.push(`/results?mood=${encodeURIComponent(mood)}&duration=${time}&language=${lang}`);
+  }
+
+  /* ── Layout wrapper ── */
   return (
-    <main className="paper-grain min-h-screen px-4 py-6 md:px-8 md:py-10">
-      <AnimatePresence>
-        {navigating && (
-          <motion.div
-            className="curtain-wipe"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.65, 0, 0.35, 1] }}
-          />
-        )}
-      </AnimatePresence>
+    <main style={{
+      minHeight: "100vh",
+      background: "hsl(220,15%,8%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "24px 16px",
+      fontFamily: "var(--font-outfit, 'Inter', sans-serif)",
+      position: "relative",
+    }}>
+      {/* bg grid */}
+      <div className="bg-grid" style={{ position: "fixed", inset: 0, pointerEvents: "none" }} />
 
-      <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ scale: 1.06, rotate: -3 }}
-              transition={{ type: "spring", stiffness: 340, damping: 22 }}
-              className="h-10 w-10 rounded-xl bg-[var(--wine)] text-white grid place-content-center shadow-[0_10px_20px_rgba(255,47,79,0.25)]"
-            >
-              <Youtube size={18} />
-            </motion.div>
-            <p className="font-serif font-semibold text-xl leading-none text-[var(--charcoal)]">LetMeWatch</p>
+      {/* card */}
+      <div style={{
+        width: "100%",
+        maxWidth: "440px",
+        position: "relative",
+        transition: "opacity 0.38s ease, transform 0.38s ease",
+        opacity: fading ? 0 : 1,
+        transform: fading ? "translateY(20px)" : "translateY(0)",
+      }}>
+
+        {/* ───────── STEP 1 : TEMPS ───────── */}
+        {step === "time" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+
+            {/* header */}
+            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: "7px",
+                padding: "7px 16px", background: "hsl(220,15%,15%)",
+                borderRadius: "999px", fontSize: "13px", color: S.muted,
+                border: "1px solid hsl(220,15%,20%)", margin: "0 auto",
+              }}>
+                <TrendingUp style={{ width: 14, height: 14, color: "#f87171" }} />
+                Quoi regarder en mangeant ?
+              </div>
+              <h1 style={{ fontSize: "clamp(26px,6vw,34px)", fontWeight: 700, color: "white", margin: 0, lineHeight: 1.15 }}>
+                Combien de temps<br />tu manges ?
+              </h1>
+              <p style={{ color: S.muted, margin: 0, fontSize: "14px" }}>
+                On va trouver la vidéo parfaite pour ton repas
+              </p>
+            </div>
+
+            {/* options */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {timeOptions.map((opt, i) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleTimeSelect(opt.value)}
+                  className="card-hover"
+                  style={{
+                    width: "100%", background: "none", border: "none",
+                    padding: 0, cursor: "pointer",
+                    animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 90}ms both`,
+                  }}
+                >
+                  <div style={{
+                    ...S.card, padding: "18px 20px",
+                    display: "flex", alignItems: "center", gap: "14px", textAlign: "left",
+                  }}>
+                    <div className="card-icon" style={{
+                      width: 52, height: 52,
+                      background: "linear-gradient(135deg,hsl(220,15%,18%),hsl(220,15%,14%))",
+                      borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center",
+                      border: "1px solid hsl(220,15%,22%)", flexShrink: 0,
+                      transition: "border-color 0.3s,color 0.3s",
+                    }}>
+                      <Clock style={{ width: 22, height: 22, color: S.muted }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+                        <span style={{ fontWeight: 700, fontSize: "17px", color: "white" }}>{opt.label}</span>
+                        <span style={{ fontSize: "13px", color: S.muted }}>— {opt.description}</span>
+                      </div>
+                      <p style={{ margin: "3px 0 0", fontSize: "13px", color: "rgba(248,113,113,0.85)", display: "flex", alignItems: "center", gap: "5px" }}>
+                        <Play style={{ width: 11, height: 11 }} />
+                        Environ {opt.videos}
+                      </p>
+                    </div>
+                    <div className="arrow-btn" style={{
+                      width: 36, height: 36, borderRadius: "50%",
+                      background: "transparent", display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.3s ease", flexShrink: 0,
+                    }}>
+                      <ArrowRight style={{ width: 18, height: 18, color: "#f87171" }} />
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-          {step !== "welcome" && (
-            <button
-              onClick={() => toStep("welcome")}
-              className="bistro-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
-            >
-              Recommencer
-            </button>
-          )}
-        </header>
+        )}
 
-        <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-          <section className="bistro-card rounded-[30px] p-7 md:p-10 relative overflow-hidden">
-            {step !== "welcome" && (
-              <div className="mb-6">
-                <StepProgress current={step} />
+        {/* ───────── STEP 2 : CONTENU ───────── */}
+        {step === "input" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+
+            {/* back */}
+            <button onClick={handleBack} style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              fontSize: "13px", color: S.muted, background: "none",
+              border: "none", cursor: "pointer", padding: 0,
+              transition: "color 0.2s", width: "fit-content",
+            }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = S.muted)}
+            >
+              <ChevronLeft style={{ width: 15, height: 15 }} />
+              Retour
+            </button>
+
+            {/* recap durée */}
+            <div style={{ ...S.card, padding: "14px 16px", display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ width: 38, height: 38, background: S.redSoft, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Clock style={{ width: 18, height: 18, color: "#f87171" }} />
+              </div>
+              <div>
+                <div style={{ fontSize: "12px", color: S.muted }}>Durée sélectionnée</div>
+                <div style={{ fontWeight: 600, color: "white", fontSize: "15px" }}>{time} minutes</div>
+              </div>
+            </div>
+
+            {/* header */}
+            <div>
+              <h2 style={{ fontSize: "22px", fontWeight: 700, color: "white", margin: "0 0 4px" }}>
+                Qu'est-ce que tu veux regarder ?
+              </h2>
+              <p style={{ color: S.muted, margin: 0, fontSize: "13px" }}>
+                Décris ou choisis une catégorie
+              </p>
+            </div>
+
+            {/* toggle write / category */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              {([
+                { m: "write"    as InputMode, icon: <PenLine style={{ width: 18, height: 18 }} />, label: "Écrire",    sub: "Je sais ce que je veux" },
+                { m: "category" as InputMode, icon: <List    style={{ width: 18, height: 18 }} />, label: "Catégorie", sub: "Donne-moi une idée" },
+              ] as const).map(({ m, icon, label, sub }) => (
+                <button
+                  key={m}
+                  onClick={() => handleModeSelect(m)}
+                  style={{
+                    background:   mode === m ? S.red       : "hsl(220,15%,12%)",
+                    border:       `2px solid ${mode === m ? S.red : "hsl(220,15%,20%)"}`,
+                    borderRadius: "14px", padding: "18px 14px",
+                    cursor: "pointer", transition: "all 0.25s ease", color: "white",
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "9px" }}>
+                    <div style={{
+                      width: 42, height: 42,
+                      background: mode === m ? "rgba(255,255,255,0.22)" : S.surface,
+                      borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {icon}
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontWeight: 600, fontSize: "14px" }}>{label}</div>
+                      <div style={{ fontSize: "11px", opacity: 0.65, marginTop: "2px" }}>{sub}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* write mode */}
+            {mode === "write" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", animation: "scaleIn 0.25s ease both" }}>
+                <div style={{ position: "relative" }}>
+                  <textarea
+                    autoFocus
+                    placeholder="Ex : documentaire nature, humour entre amis, tech, cuisine japonaise…"
+                    value={text}
+                    onChange={e => setText(e.target.value)}
+                    rows={4}
+                    style={{
+                      width: "100%", resize: "none", fontSize: "14px",
+                      background: "hsl(220,15%,12%)",
+                      border: "1px solid hsl(220,15%,20%)",
+                      borderRadius: "12px", padding: "13px 13px 30px",
+                      color: "white", fontFamily: "inherit",
+                      outline: "none", boxSizing: "border-box",
+                      transition: "border-color 0.2s",
+                      lineHeight: 1.6,
+                    }}
+                    onFocus={e => (e.target.style.borderColor = "rgba(239,68,68,0.5)")}
+                    onBlur={e  => (e.target.style.borderColor = "hsl(220,15%,20%)")}
+                  />
+                  <span style={{ position: "absolute", bottom: "10px", right: "12px", fontSize: "11px", color: S.muted }}>
+                    {text.length}
+                  </span>
+                </div>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit}
+                  style={{
+                    width: "100%", padding: "13px",
+                    background: canSubmit ? S.red : "hsl(220,15%,18%)",
+                    color: canSubmit ? "white" : "hsl(220,10%,35%)",
+                    border: "none", borderRadius: "12px",
+                    fontSize: "14px", fontWeight: 600,
+                    cursor: canSubmit ? "pointer" : "not-allowed",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => canSubmit && (e.currentTarget.style.background = "#dc2626")}
+                  onMouseLeave={e => canSubmit && (e.currentTarget.style.background = S.red)}
+                >
+                  Trouver des vidéos <ArrowRight style={{ width: 15, height: 15 }} />
+                </button>
               </div>
             )}
 
-            <AnimatePresence custom={direction} mode="wait">
-              {step === "welcome" && (
-                <motion.div key="welcome" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--wine)] mb-5">
-                    Direct et utile
-                  </p>
-                  <SplitTitle text="T'en as marre de scroller sans savoir quoi lancer ?" />
-                  <p className="mt-6 max-w-xl text-[15px] md:text-base text-[rgba(21,32,51,0.76)] leading-relaxed">
-                    En quelques secondes, tu donnes ton temps, ton contexte, ta langue et tu regardes.
-                  </p>
-
-                  <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                    <motion.button
-                      whileHover={{ y: -2, scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => toStep("duration")}
-                      className="yt-button rounded-2xl bg-[var(--wine)] text-white px-6 py-4 font-semibold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_10px_22px_rgba(255,47,79,0.24)]"
-                    >
-                      Commencer
-                      <ChevronRight size={18} />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => pushToResults("any", true)}
-                      className="yt-button rounded-2xl border border-[rgba(21,32,51,0.15)] bg-white px-6 py-4 font-semibold text-sm md:text-base text-[var(--ink)] flex items-center justify-center gap-2"
-                    >
-                      <Shuffle size={16} />
-                      Surprise directe
-                    </motion.button>
-                  </div>
-                </motion.div>
-              )}
-
-              {step === "duration" && (
-                <motion.div key="duration" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Combien de temps tu as ?</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">On calibre la duree des videos sur ton temps reel.</p>
-                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                    {DURATIONS.map((item, index) => (
-                      <motion.button
-                        key={item.value}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.06 }}
-                        whileHover={{ y: -4 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          setDuration(item.value);
-                          toStep("mood");
-                        }}
-                        className="yt-button rounded-2xl border border-[rgba(21,32,51,0.14)] bg-white p-4 text-left hover:shadow-[0_12px_24px_rgba(21,32,51,0.08)]"
-                      >
-                        <p className="text-2xl">{item.icon}</p>
-                        <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
-                        <p className="text-sm text-[rgba(21,32,51,0.62)]">{item.note}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                  <button onClick={() => toStep("welcome")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
-                    <ChevronLeft size={14} /> Retour
+            {/* category mode */}
+            {mode === "category" && (
+              <div style={{
+                display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px",
+                animation: "scaleIn 0.25s ease both",
+              }}>
+                {categories.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => handleCatSelect(c.id)}
+                    style={{
+                      background:   cat === c.id ? "hsl(220,15%,16%)" : "hsl(220,15%,11%)",
+                      border:       `2px solid ${cat === c.id ? "rgba(239,68,68,0.45)" : "transparent"}`,
+                      borderRadius: "11px", padding: "12px", cursor: "pointer",
+                      transition: "all 0.18s ease", textAlign: "left",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "hsl(220,15%,28%)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = cat === c.id ? "rgba(239,68,68,0.45)" : "transparent"; }}
+                  >
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "9px" }}>
+                      <div style={{
+                        width: 34, height: 34, borderRadius: "8px",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        background: c.bg, color: c.color, flexShrink: 0,
+                      }}>
+                        {c.icon}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: "13px", color: "white", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {c.label}
+                        </div>
+                        <div style={{ fontSize: "11px", color: S.muted, marginTop: "1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {c.description}
+                        </div>
+                      </div>
+                    </div>
                   </button>
-                </motion.div>
-              )}
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-              {step === "mood" && (
-                <motion.div key="mood" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Decris ce que t'as envie de regarder</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Le texte libre est prioritaire: ecris comme tu veux, meme en une phrase naturelle.</p>
+        {/* ───────── STEP 3 : RECAP ───────── */}
+        {step === "summary" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px", alignItems: "center" }}>
 
-                  <div className="yt-input-wrap mt-5 rounded-3xl p-5">
-                    <label htmlFor="custom-mood" className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--charcoal)]">Ton texte libre</label>
-                    <p className="mt-1 text-sm text-[rgba(21,32,51,0.62)]">Ex: "quelque chose de captivant, pas trop bruyant, autour de 25 min"</p>
-                    <div className="mt-3 relative">
-                      <input
-                        id="custom-mood"
-                        ref={inputRef}
-                        type="text"
-                        value={customMood}
-                        onChange={(e) => {
-                          setCustomMood(e.target.value);
-                          if (e.target.value) setMood(null);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && customMood.trim()) toStep("language");
-                        }}
-                        placeholder="Decris exactement ce que tu veux regarder..."
-                        className="yt-input w-full rounded-2xl px-4 py-4 pr-32 text-sm outline-none"
-                      />
-                      <button
-                        onClick={() => {
-                          if (customMood.trim()) toStep("language");
-                        }}
-                        disabled={!customMood.trim()}
-                        className="yt-button absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--wine)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-45 shadow-[0_8px_18px_rgba(255,47,79,0.22)]"
-                      >
-                        Continuer
-                      </button>
+            {/* success icon */}
+            <div style={{ position: "relative" }}>
+              <div style={{
+                width: 76, height: 76,
+                background: "linear-gradient(135deg,#ef4444,#dc2626)",
+                borderRadius: "20px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                animation: "pulseGlow 2s ease infinite",
+              }}>
+                <Check style={{ width: 38, height: 38, color: "white", strokeWidth: 2.5 }} />
+              </div>
+              <div style={{
+                position: "absolute", bottom: -4, right: -4,
+                width: 26, height: 26, background: "hsl(220,15%,8%)",
+                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                border: "2px solid #ef4444",
+              }}>
+                <Sparkles style={{ width: 12, height: 12, color: "#f87171" }} />
+              </div>
+            </div>
+
+            <div style={{ textAlign: "center" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 700, color: "white", margin: "0 0 3px" }}>Parfait !</h2>
+              <p style={{ color: S.muted, margin: 0, fontSize: "13px" }}>On va te trouver les meilleures vidéos pour ton repas</p>
+            </div>
+
+            {/* recap card */}
+            <div style={{ width: "100%", ...S.card, overflow: "hidden", position: "relative" }}>
+              {/* gradient top bar */}
+              <div style={{ height: 3, background: "linear-gradient(to right,#ef4444,#f97316,#eab308)" }} />
+              <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+
+                {/* durée */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  paddingBottom: "14px", borderBottom: "1px solid hsl(220,15%,20%)",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
+                    <div style={{ width: 42, height: 42, background: S.surface, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Clock style={{ width: 19, height: 19, color: S.muted }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "12px", color: S.muted }}>Durée</div>
+                      <div style={{ fontWeight: 700, fontSize: "16px", color: "white" }}>{time} minutes</div>
                     </div>
                   </div>
+                  <span style={{ padding: "4px 11px", background: S.redSoft, color: "#f87171", borderRadius: "999px", fontSize: "12px", fontWeight: 600 }}>
+                    {time === 15 ? "Rapide" : time === 30 ? "Standard" : "Long repas"}
+                  </span>
+                </div>
 
-                  <p className="mt-5 text-xs uppercase tracking-[0.16em] text-[rgba(21,32,51,0.56)]">Ou utilise un raccourci</p>
-                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                    {MOODS.map((item, index) => (
-                      <motion.button
-                        key={item.value}
-                        initial={{ opacity: 0, scale: 0.93 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.025 }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => {
-                          setMood(item.value);
-                          setCustomMood("");
-                          toStep("language");
-                        }}
-                        className="yt-button rounded-xl px-3 py-3 text-center border text-sm hover:shadow-[0_8px_18px_rgba(21,32,51,0.08)]"
-                        style={{
-                          borderColor: mood === item.value && !customMood ? "rgba(255,47,79,0.42)" : "rgba(21,32,51,0.14)",
-                          background: mood === item.value && !customMood ? "rgba(255,47,79,0.1)" : "rgba(255,255,255,0.8)",
-                        }}
-                      >
-                        <span className="block text-xl">{item.icon}</span>
-                        <span className="mt-1 block text-[13px] font-semibold text-[var(--charcoal)]">{item.label}</span>
-                      </motion.button>
-                    ))}
+                {/* contenu */}
+                <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
+                  <div style={{ width: 42, height: 42, background: S.surface, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {mode === "write"
+                      ? <PenLine style={{ width: 19, height: 19, color: S.muted }} />
+                      : <List    style={{ width: 19, height: 19, color: S.muted }} />}
                   </div>
-
-                  <button onClick={() => toStep("duration")} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
-                    <ChevronLeft size={14} /> Retour
-                  </button>
-                </motion.div>
-              )}
-
-              {step === "language" && (
-                <motion.div key="language" custom={direction} variants={pageVariants} initial="enter" animate="center" exit="exit">
-                  <h2 className="font-serif font-semibold text-[clamp(1.9rem,5vw,3rem)] text-[var(--charcoal)]">Quelle langue preferee ?</h2>
-                  <p className="mt-2 text-[rgba(21,32,51,0.72)]">Derniere etape, puis on lance les videos.</p>
-                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                    {LANGUAGES.map((item, index) => (
-                      <motion.button
-                        key={item.value}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.06 }}
-                        whileHover={{ y: -4 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => pushToResults(item.value)}
-                        className="yt-button rounded-2xl border border-[rgba(21,32,51,0.15)] bg-white p-5 text-center hover:shadow-[0_10px_22px_rgba(21,32,51,0.08)]"
-                      >
-                        <p className="text-4xl">{item.flag}</p>
-                        <p className="mt-3 font-serif font-semibold text-2xl text-[var(--charcoal)]">{item.label}</p>
-                      </motion.button>
-                    ))}
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: "12px", color: S.muted }}>Contenu</div>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {mode === "write" ? text : selectedCat?.label}
+                    </div>
                   </div>
-                  <button onClick={() => toStep("mood")} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--wine)]">
-                    <ChevronLeft size={14} /> Retour
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </section>
-
-          <aside className="bistro-card rounded-[30px] p-6 md:p-7 h-fit">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--wine)] font-semibold">Ton briefing</p>
-            <div className="mt-4 space-y-3">
-              {[
-                { icon: Clock3, title: "Temps", text: duration ? `${duration} min` : "A definir" },
-                {
-                  icon: MessageSquareText,
-                  title: "Contexte",
-                  text: customMood.trim() || (mood ? "Preset selectionne" : "Texte libre ou preset"),
-                },
-                {
-                  icon: Languages,
-                  title: "Langue",
-                  text: step === "language" ? "Choisis maintenant" : "FR, EN ou peu importe",
-                },
-              ].map((item) => (
-                <motion.div
-                  key={item.title}
-                  whileHover={{ y: -2 }}
-                  className="rounded-xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4 flex gap-3"
-                >
-                  <item.icon size={16} className="text-[var(--wine)] mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--charcoal)]">{item.title}</p>
-                    <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">{item.text}</p>
-                  </div>
-                </motion.div>
-              ))}
+                  {mode === "category" && selectedCat && (
+                    <div style={{ width: 34, height: 34, borderRadius: 8, background: selectedCat.bg, color: selectedCat.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: "auto" }}>
+                      {selectedCat.icon}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="mt-5 rounded-2xl border border-[rgba(21,32,51,0.12)] bg-white/78 p-4">
-              <p className="text-sm font-semibold text-[var(--charcoal)]">Resultat attendu</p>
-              <p className="text-xs text-[rgba(21,32,51,0.62)] mt-1">Des videos directement regardables, sans perte de temps.</p>
+
+            {/* actions */}
+            <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+              <button
+                onClick={handleReset}
+                style={{
+                  padding: "13px 18px", background: "hsl(220,15%,12%)",
+                  border: "1px solid hsl(220,15%,22%)", borderRadius: "12px",
+                  color: S.muted, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: "6px",
+                  fontSize: "13px", fontWeight: 500,
+                  transition: "all 0.2s", whiteSpace: "nowrap",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = "white"; e.currentTarget.style.borderColor = "hsl(220,15%,30%)"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = S.muted;  e.currentTarget.style.borderColor = "hsl(220,15%,22%)"; }}
+              >
+                <RotateCcw style={{ width: 14, height: 14 }} /> Modifier
+              </button>
+              <button
+                onClick={handleSearch}
+                style={{
+                  flex: 1, padding: "13px", background: S.red,
+                  border: "none", borderRadius: "12px",
+                  color: "white", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
+                  fontSize: "14px", fontWeight: 700,
+                  transition: "background 0.2s",
+                  boxShadow: "0 4px 20px rgba(239,68,68,0.35)",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#dc2626")}
+                onMouseLeave={e => (e.currentTarget.style.background = S.red)}
+              >
+                <Play style={{ width: 15, height: 15 }} />
+                Lancer la recherche
+              </button>
             </div>
-          </aside>
-        </div>
+          </div>
+        )}
       </div>
     </main>
   );
