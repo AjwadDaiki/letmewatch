@@ -225,7 +225,7 @@ body {
   z-index: 80;
   pointer-events: none;
   transform-origin: left;
-  background: linear-gradient(90deg, #a80f2a, var(--yt-red), #ff5f79);
+  background: #ff0000;
 }
 
 .focus-halo {

@@ -7,14 +7,11 @@ import {
   ArrowRight,
   Brain,
   ChevronLeft,
-  Clock,
-  Languages,
   Loader2,
   Search,
   Sparkles,
   Utensils,
   Youtube,
-  Zap,
 } from "lucide-react";
 
 type Step = "welcome" | "time" | "context" | "language" | "loading";
@@ -59,8 +56,8 @@ const keywordOptions: KeywordOption[] = [
 ];
 
 const languageOptions: { id: Language; label: string; emoji: string; helper: string }[] = [
-  { id: "fr", label: "Francais", emoji: "🇫🇷", helper: "Creators FR en priorite" },
-  { id: "en", label: "English", emoji: "🇬🇧", helper: "Creators EN en priorite" },
+  { id: "fr", label: "Francais", emoji: "🇫🇷", helper: "Recommandations en francais" },
+  { id: "en", label: "English", emoji: "🇺🇸", helper: "Recommendations in English" },
 ];
 
 const loadingPhases = [
@@ -222,22 +219,6 @@ export default function Home() {
                   Trouve la bonne video YouTube selon ton temps et ton contexte.
                 </p>
 
-                <div className="mb-12 flex flex-wrap justify-center gap-3">
-                  {[
-                    { icon: Clock, text: "Sans compte" },
-                    { icon: Zap, text: "Resultat rapide" },
-                    { icon: Sparkles, text: "Contexte libre" },
-                  ].map((feature) => (
-                    <div
-                      key={feature.text}
-                      className="flex items-center gap-2 rounded-full border border-[#3F3F3F]/50 bg-[#1F1F1F] px-4 py-2.5 text-[#AAAAAA] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#5A5A5A] hover:text-white"
-                    >
-                      <feature.icon className="h-4 w-4 text-[#FF0000]" />
-                      <span className="text-sm font-medium">{feature.text}</span>
-                    </div>
-                  ))}
-                </div>
-
                 <div className="mb-12 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
                   {[
                     { num: "1", text: "Choisis ton temps" },
@@ -366,7 +347,7 @@ export default function Home() {
                     Decris ce que tu veux regarder
                   </h2>
                   <p className="text-[#AAAAAA]">
-                    Appuie sur Entrer pour passer a la langue.
+                    Ecris librement, puis valide avec Entrer.
                   </p>
                 </div>
 
@@ -383,25 +364,22 @@ export default function Home() {
                 )}
 
                 <div className="mx-auto mb-5 w-full max-w-2xl">
-                  <textarea
-                    value={contextText}
-                    onChange={(event) => setContextText(event.target.value)}
-                    onKeyDown={handleContextEnter}
-                    placeholder="Ex: j ai envie de quelque chose de fun et pas trop long..."
-                    className="w-full resize-none rounded-2xl border-2 border-[#3F3F3F]/50 bg-[#1F1F1F] px-5 py-4 text-lg leading-relaxed text-white outline-none transition-all duration-300 placeholder:text-[#666666] focus:border-[#FF0000] focus:shadow-[0_0_0_4px_rgba(255,0,51,0.12)]"
-                    rows={3}
-                  />
-
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#3F3F3F]/40 bg-[#1B1B1D] px-3 py-2.5">
-                    <p className="text-xs text-[#9A9A9A]">
-                      `Enter` continue directement
-                    </p>
+                  <div className="relative">
+                    <textarea
+                      value={contextText}
+                      onChange={(event) => setContextText(event.target.value)}
+                      onKeyDown={handleContextEnter}
+                      placeholder="Ex: j ai envie de quelque chose de fun et pas trop long..."
+                      className="w-full resize-none rounded-2xl border-2 border-[#3F3F3F]/50 bg-[#1F1F1F] px-5 py-4 pr-32 text-lg leading-relaxed text-white outline-none transition-all duration-300 placeholder:text-[#666666] focus:border-[#FF0000] focus:shadow-[0_0_0_4px_rgba(255,0,51,0.12)]"
+                      rows={3}
+                    />
                     <button
                       onClick={() => canContinue && goToStep("language")}
                       disabled={!canContinue}
-                      className="yt-button rounded-lg bg-[#FF0000] px-3.5 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
+                      className="yt-button absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-lg bg-[#FF0000] px-3.5 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
                     >
-                      Continuer
+                      Entrer
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
@@ -445,28 +423,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="sticky bottom-4 z-10 mx-auto w-full max-w-md">
-                  <button
-                    onClick={() => canContinue && goToStep("language")}
-                    disabled={!canContinue}
-                    className={`
-                      relative w-full overflow-hidden rounded-xl px-8 py-4 text-lg font-bold text-white transition-all duration-300
-                      ${canContinue
-                        ? "bg-gradient-to-r from-[#FF0000] to-[#CC0000] hover:scale-[1.015] hover:shadow-xl hover:shadow-red-500/30 active:scale-[0.98]"
-                        : "cursor-not-allowed bg-[#272727] text-[#666666]"
-                      }
-                    `}
-                  >
-                    {canContinue && (
-                      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]" />
-                    )}
-                    <span className="relative flex items-center justify-center gap-3">
-                      <Languages className="h-6 w-6" />
-                      Choisir la langue
-                      <ArrowRight className="h-5 w-5" />
-                    </span>
-                  </button>
-                </div>
               </motion.section>
             )}
 
